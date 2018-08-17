@@ -1,0 +1,30 @@
+<div class="container-fluid">
+    <div class="row">
+        <h2 class="">Rotate</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-8 col-md-8 col-lg-8">
+            <img class="" style="width:50% !important; max-height:50% !important;" src="/<?php echo $aRotateDetails["folder"] ?><?php echo $aRotateDetails["fileName"] ?>?v=<?php echo rand(); ?>" id="rotate-image" />
+        </div>
+        <div class="col-sm-4 col-md-4 col-lg-4">
+            <form name="rotate-image" id="rotate-image" action="<?php echo $this->url('images', array('action' => 'rotate')); ?>" method="post">
+                <span class="btn btn-default rotateBtn" data-degree="90"><i class="fas fa-redo"></i></span>
+                <span class="btn btn-default rotateBtn" data-degree="-90"><i class="fas fa-undo"></i></span>
+                <input type="hidden" value="0" name="rotation" />
+                <input class="btn btn-default"  type="submit" name="submit" value="Rotate afbeelding" />
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    var rotation = 0;
+    $(".rotateBtn").on("click", function () {
+        var degree = $(this).data('degree');
+        if(rotation == 360 || rotation == -360){
+            rotation = 0;
+        }
+        rotation = rotation + degree;
+        $("#rotate-image").rotate(rotation);
+        $('input[name="rotation"]').val(rotation);
+    });
+</script>
