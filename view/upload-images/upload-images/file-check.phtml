@@ -1,0 +1,38 @@
+<?php
+$this->mainMenu()->setActiveItemId('imagesbeheer');
+$this->pageBreadcrumbs()->setItems([
+    'Beheer' => $this->url('beheer'),
+    'Images' => $this->url('beheer/images'),
+]);
+?>
+<hgroup id="headAdminTitle" class="col-sm-12 col-md-12 col-lg-12">
+    <h1 id="index">IMAGES BEHEER</h1>
+</hgroup>
+<!-- Breadcrumbs -->
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <?= $this->pageBreadcrumbs()->render(); ?>
+</div>
+<p class="col-lg-12 col-md-12 col-sm-12">
+    <span class="btn btn-default checkDatabaseImages">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Check Database images
+    </span>
+</p>
+<!-- Main Content -->
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <table class="table table-condensed table-bordered table-hover">
+        <tr>
+            <th class="text-center"><input type="checkbox" value="1" name="checkAll" /></th>
+            <th>In database</th>
+            <th>Op server</th>
+        </tr>
+        <?php foreach ($images AS $image) { ?>
+        <tr id="img<?php echo $image->getId(); ?>">
+            <td class="text-center"><input type="checkbox" value="<?php echo $image->getId(); ?>|<?php echo $image->getFolder() . $image->getFileName(); ?>" name="url"  /></td>
+            <td>
+                <?php echo $image->getFolder() . $image->getFileName(); ?>
+            </td>
+            <td class="result"></td>
+        </tr>
+        <?php } ?>
+    </table>
+</div>

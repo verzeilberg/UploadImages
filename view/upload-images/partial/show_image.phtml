@@ -1,0 +1,23 @@
+<?php
+if (empty($image)) {
+    echo $this->partial('upload-images/partial/upload_image.phtml', array('formImage' => $formEventImage));
+} else {
+    ?>
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <hr/>
+        <div id="image<?php echo $image->getImageId(); ?>">
+            <?php echo '<img class="img-thumbnail img-responsive " src="/' . $image->getImageTypes('400x200')[0]->getFolder() . $image->getImageTypes('400x200')[0]->getFileName() . '?v='.rand().'" alt="' . $image->getAlt() . '"/>'; ?>
+            <div class="imageOptions">
+                <span data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm editImage glyphicon glyphicon-pencil" aria-hidden="true" data-dismiss="modal" data-target="#showImages"></span>
+                <span data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm deleteImageObject glyphicon glyphicon-trash" aria-hidden="true"></span>
+                <span data-id="<?php echo $returnURL['id'] ?>" data-route="<?php echo $returnURL['route'] ?>" data-action="<?php echo $returnURL['action'] ?>" data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm recropImage"><i class="fa fa-crop" aria-hidden="true"></i></span>
+                <span data-id="<?php echo $returnURL['id'] ?>" data-route="<?php echo $returnURL['route'] ?>" data-action="<?php echo $returnURL['action'] ?>"  data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm rotateImage"><i class="fa fa-undo" aria-hidden="true"></i></span>
+            </div>
+        </div>
+        <hr/>
+    </div>
+    <?php
+}
+?>
+<!-- Edit afbeelding -->
+<?php echo $this->partial('upload-images/partial/edit_image.phtml'); ?>

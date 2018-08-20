@@ -1,0 +1,19 @@
+<?php
+$this->headTitle('Add Blog');
+$this->mainMenu()->setActiveItemId('blog');
+$this->pageBreadcrumbs()->setItems([
+    'Beheer' => $this->url('beheer'),
+    'Images' => $this->url('beheer/images')
+]);
+?>
+<hgroup id="headAdminTitle" class="col-sm-12 col-md-12 col-lg-12">
+    <h1 id="index">Images</h1>
+</hgroup>
+<!-- Breadcrumbs -->
+<div class="col-lg-12 col-md-12 col-sm-12">
+    <?= $this->pageBreadcrumbs()->render(); ?>
+</div>
+<!-- Main Content -->
+<div class="container">
+
+</div>

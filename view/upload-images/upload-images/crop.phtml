@@ -1,0 +1,47 @@
+<div class="container-fluid">
+    
+    <h2>CROP <?php echo $sCropReference ?></h2>
+    <img src="/<?php echo $sImageToBeCropped ?>" id="target" />
+    
+    
+    <div class="clear"></div>
+    <form name="crop-image" id="crop-image" action="<?php echo $this->url('images', array('action' => 'crop')); ?>"" method="post" >
+        <input type="hidden" id="x" name="x" value="" />
+        <input type="hidden" id="y" name="y" value="" />
+        <input type="hidden" id="x2" name="x2" value="" />
+        <input type="hidden" id="y2" name="y2" value="" />
+        <input type="hidden" id="w" name="w" value="" />
+        <input type="hidden" id="h" name="h" value="" />
+        <input type="hidden" name="referenceName" value="<?php echo $sCropReference ?>" />
+        <input type="hidden" name="imageToBeCropped" value="<?php echo  $sImageToBeCropped ?>" />
+        <input type="hidden" name="DestionationFolderCroppedImage" value="<?php echo $sDestionationFolderCroppedImage ?>" />
+        <input type="hidden" name="image-crop" value="cropped" />
+        <br/><br/>
+        <input class="btn btn-default"  type="submit" name="submit" value="Crop afbeelding" /> <?php echo  $iXcrops ?> image<?= ($iXcrops < 2? '':'s') ?> to crop.
+    </form>
+</div>
+<script>
+
+    jQuery(function($) {
+        $('#target').Jcrop({
+            onChange: showCoords,
+            onSelect: showCoords,
+            minSize:  [<?php echo  $iImgW ?>, <?php echo  $iImgH ?>],
+            setSelect:   [ <?php echo  $iImgW ?>, <?php echo  $iImgH ?>, 0, 0 ],
+            aspectRatio: <?php echo  $iImgW ?> / <?php echo  $iImgH ?>,
+            boxWidth: 800, 
+            boxHeight: 600
+        });
+        
+        function showCoords(c)
+        {
+            $('#x').val(c.x);
+            $('#y').val(c.y);
+            $('#x2').val(c.x2);
+            $('#y2').val(c.y2);
+            $('#w').val(c.w);
+            $('#h').val(c.h);
+        };
+    });
+
+</script>

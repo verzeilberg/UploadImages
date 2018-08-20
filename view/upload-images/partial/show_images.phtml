@@ -1,0 +1,31 @@
+<!-- Afbeeldingen -->
+<div class="row grid img-thumbnails" id="sortableItems">
+    <?php
+    if (count($images) > 0) {
+        foreach ($images AS $image) {
+            foreach ($image->getImageTypes('150x150') AS $imageType) {
+                ?>
+                <div class="col-md-4 tile">
+                    <div id="image<?php echo $image->getImageId(); ?>">
+                        <?php
+                        echo '<img class="img-thumbnail" src="/' . $imageType->getFolder() . $imageType->getFileName() . '?v='.rand().'" alt="' . $image->getAlt() . '"/>';
+                        ?>
+                        <div class="imageOptions">
+                            <span data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm editImage glyphicon glyphicon-pencil" aria-hidden="true" data-dismiss="modal" data-target="#showImages"></span>
+                            <span data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm deleteImageObject glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            <span data-id="<?php echo $returnURL['id'] ?>" data-route="<?php echo $returnURL['route'] ?>" data-action="<?php echo $returnURL['action'] ?>" data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm recropImage"><i class="fa fa-crop" aria-hidden="true"></i></span>
+                            <span data-id="<?php echo $returnURL['id'] ?>" data-route="<?php echo $returnURL['route'] ?>" data-action="<?php echo $returnURL['action'] ?>"  data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm rotateImage"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <?php
+            }
+        }
+    } else {
+        ?>
+        <p>Nog geen afbeeldingen geupload</p>
+    <?php } ?>
+</div>
+
+<!-- Edit afbeelding -->
+<?php echo $this->partial('upload-images/partial/edit_image.phtml'); ?>
