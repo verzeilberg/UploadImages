@@ -185,8 +185,8 @@ class UploadImagesController extends AbstractActionController {
         );
     }
 
-    public function createRedirectLink($aReturnURL = null) {
-        if ($aReturnURL == null) {
+    public function createRedirectLink($aReturnURL = NULL) {
+        if ($aReturnURL === NULL) {
             $this->redirect()->toRoute('home');
         } else {
             $route = $aReturnURL['route'];
