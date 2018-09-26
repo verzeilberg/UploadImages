@@ -1,4 +1,15 @@
+//Create well design file upload form file
+$(document).on('change', ':file', function () {
+    var input = $(this),
+            numFiles = input.get(0).files ? input.get(0).files.length : 1,
+            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+    input.trigger('fileselect', [numFiles, label]);
+
+    $('input[name=fileUploadFileName]').val(label);
+});
+
 $(document).ready(function () {
+
 //Open model afbeeldingen
     $('#showImages').on('shown.bs.modal', function () {
     });
@@ -29,6 +40,9 @@ $(document).ready(function () {
             url: "/ajaximage/getImage",
             async: true,
             success: function (data) {
+
+                console.log(data);
+
                 if (data.succes === true) {
                     $('input[name=editNameImage]').val(data.imageDetails.imageName);
                     $('input[name=editAlt]').val(data.imageDetails.imageAlt);
@@ -119,7 +133,7 @@ $(document).ready(function () {
             }
         });
     });
-    
+
     //Ajax function to rotate image
     $("span.rotateImage").on("click", function () {
         var imageId = $(this).data('imageid');

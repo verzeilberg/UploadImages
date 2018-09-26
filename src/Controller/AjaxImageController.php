@@ -98,8 +98,7 @@ class AjaxImageController extends AbstractActionController {
             $imageDetails['imageDescription'] = $image->getDescriptionImage();
             $succes = true;
         }
-
-
+        
         return new JsonModel([
             'errorMessage' => $errorMessage,
             'succes' => $succes,

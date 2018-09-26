@@ -59,6 +59,9 @@ return [
         'template_path_stack' => [
             'uploadimages' => __DIR__ . '/../view',
         ],
+        'strategies' => [
+            'ViewJsonStrategy',
+        ],
     ],
     // The 'access_filter' key is used by the User module to restrict or permit
     // access to certain controller actions for unauthorized visitors.
@@ -103,7 +106,6 @@ return [
             'png',
             'gif'
         ],
-        //'rootPath' => dirname(__DIR__) . '/../../public/img/userFiles'
         'rootPath' => $_SERVER['DOCUMENT_ROOT'] . '/img/userFiles',
     ],
 ];
