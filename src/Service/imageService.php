@@ -201,7 +201,7 @@ class imageService implements imageServiceInterface {
         $qb->where('it.isOriginal = 1');
         $qb->andWhere('i.ImageId = ' . $imageId);
         $imageOriginal = $qb->getQuery()->getSingleResult();
-        
+
         return $imageOriginal;
     }
 
@@ -313,6 +313,19 @@ class imageService implements imageServiceInterface {
         } else {
             return false;
         }
+    }
+
+    /**
+     * 
+     * Delete imageType
+     *
+     * @param type $imageType object
+     * @return void
+     * 
+     */
+    public function saveImage($image) {
+        $this->em->persist($image);
+        $this->em->flush();
     }
 
 }

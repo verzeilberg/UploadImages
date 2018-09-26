@@ -14,17 +14,15 @@
         <!-- Le styles -->
         <?=
                 $this->headLink(['rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'])
-                ->prependStylesheet($this->basePath('css/style-beheer.css'))
-                ->prependStylesheet($this->basePath('css/bootstrap-theme-custom.css'))
-                ->prependStylesheet($this->basePath('css/bootstrap.min.css'))
+                ->prependStylesheet($this->basePath('css/bootstrap-4.0.0/bootstrap.min.css'))
         ?>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 
         <!-- Scripts -->
         <?=
                 $this->headScript()
-                ->prependFile($this->basePath('js/custom/beheer.js'))
-                ->prependFile($this->basePath('js/bootstrap.min.js'))
-                ->prependFile($this->basePath('js/jquery-3.1.0.min.js'))
+                ->prependFile($this->basePath('js/bootstrap-4.0.0/bootstrap.min.js'))
+                ->prependFile($this->basePath('js/jquery-2.2.4.min.js'))
         ?>
     </head>
     <body>

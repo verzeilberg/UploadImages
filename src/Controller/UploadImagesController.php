@@ -76,7 +76,7 @@ class UploadImagesController extends AbstractActionController {
     public function cropAction() {
         $this->layout('layout/crop');
         $this->vhm->get('headScript')->appendFile('/js/jquery.Jcrop.min.js');
-        $this->vhm->get('headLink')->appendStylesheet('/css/jCrop/jquery.Jcrop.min');
+        $this->vhm->get('headLink')->appendStylesheet('/css/jCrop/jquery.Jcrop.min.css');
         $container = new Container('cropImages');
         $aCropDetails = $container->offsetGet('cropimages');
         $aReturnURL = $container->offsetGet('returnUrl');

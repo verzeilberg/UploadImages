@@ -60,17 +60,6 @@ return [
             'uploadimages' => __DIR__ . '/../view',
         ],
     ],
-    'imageUploadSettings' => [
-        'uploadFolder' => 'img/userFiles/blog/original/',
-        'uploadeFileSize' => '5000000000000000',
-        'allowedFileExtensionss' => [
-            'jpg',
-            'png',
-            'gif'
-        ],
-        //'rootPath' => dirname(__DIR__) . '/../../public/img/userFiles'
-        'rootPath' => $_SERVER['DOCUMENT_ROOT'] . '/img/userFiles',
-    ],
     // The 'access_filter' key is used by the User module to restrict or permit
     // access to certain controller actions for unauthorized visitors.
     'access_filter' => [
@@ -105,5 +94,16 @@ return [
                 __DIR__ . '/../public',
             ],
         ],
+    ],
+    'imageUploadSettings' => [
+        'uploadFolder' => 'img/userFiles/countries/original/',
+        'uploadeFileSize' => '5000000000000000',
+        'allowedImageTypes' => [
+            'jpg',
+            'png',
+            'gif'
+        ],
+        //'rootPath' => dirname(__DIR__) . '/../../public/img/userFiles'
+        'rootPath' => $_SERVER['DOCUMENT_ROOT'] . '/img/userFiles',
     ],
 ];
