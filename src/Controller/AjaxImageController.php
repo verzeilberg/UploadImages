@@ -59,7 +59,6 @@ class AjaxImageController extends AbstractActionController {
             foreach ($imageTypes AS $imageType) {
                 @unlink('public/' . $imageType->getFolder() . $imageType->getFileName());
                 $this->em->remove($imageType);
-                $this->em->flush();
             }
 
             $this->em->remove($image);
@@ -179,7 +178,7 @@ class AjaxImageController extends AbstractActionController {
         foreach ($imageTypes as $imageType) {
             $width = $imageType['width'];
             $height = $imageType['height'];
-            $imageTypeName = ['imageTypeName'];
+            $imageTypeName = $imageType['imageTypeName'];
             $folder = $imageType['folder'];
             $cropImages = $this->cropImageService->createReCropArray($imageTypeName, $originalFolder, $originalFileName, 'public/' . $folder, $width, $height, $cropImages);
         }

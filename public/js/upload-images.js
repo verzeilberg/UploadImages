@@ -101,6 +101,7 @@ $(document).ready(function () {
                     $('#image' + data.imageId).parent('div').fadeOut(300, function () {
                         $('#image' + data.imageId).parent('div').remove();
                     })
+                    location.reload();
                 } else {
                     alert(data.errorMessage);
                 }

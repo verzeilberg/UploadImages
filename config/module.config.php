@@ -102,9 +102,9 @@ return [
         'uploadFolder' => 'img/userFiles/countries/original/',
         'uploadeFileSize' => '5000000000000000',
         'allowedImageTypes' => [
-            'jpg',
-            'png',
-            'gif'
+            'image/jpeg',
+            'image/png',
+            'image/gif'
         ],
         'rootPath' => $_SERVER['DOCUMENT_ROOT'] . '/img/userFiles',
     ],

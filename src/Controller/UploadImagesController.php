@@ -86,7 +86,7 @@ class UploadImagesController extends AbstractActionController {
         if (empty($aCropDetails)) {
             return $this->createRedirectLink($aReturnURL);
         }
-
+        
         //Get the first item in the array
         $oCropDetails = $aCropDetails[0];
 
