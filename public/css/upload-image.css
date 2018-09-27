@@ -9,12 +9,22 @@
 .recropImage i {
     font-size:16px;
 }
-
 .btn-file {
-    position: relative;
+        position: relative;
     overflow: hidden;
     cursor: pointer;
+    color: #ffffff;
+    background-color: #b8c2b8;
+    background-image: linear-gradient(to bottom, #494f49, #292e29);
+    border-color: #839683 #839683 #839683;
 }
+.btn-file:hover  {
+    color: #ffffff;
+    background-color: #292e29;
+    background-image: linear-gradient(to bottom, #292e29, #292e29);
+    border-color: #839683 #839683 #839683;
+}
+
 .btn-file input[type=file] {
     position: absolute;
     top: 0;
