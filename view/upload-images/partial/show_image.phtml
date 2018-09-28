@@ -1,5 +1,5 @@
 <?php
-if (empty($image)) {
+if (empty($image) || $image->getImageId() === null) {
     echo $this->partial('upload-images/partial/upload_image.phtml', array('formImage' => $formImage));
 } else {
     ?>
