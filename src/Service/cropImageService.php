@@ -25,7 +25,7 @@ class cropImageService implements cropImageServiceInterface {
         $this->em = $em;
     }
 
-    public function uploadImage($image, $imageUploadSettings = NULL, $imageType = 'original', $Image = NULL, $isOriginal = 0) {
+    public function uploadImage($image, $imageUploadSettings = 'default', $imageType = 'original', $Image = NULL, $isOriginal = 0) {
 
         //Check if provided image ia an array
         if (!is_array($image)) {
@@ -36,15 +36,11 @@ class cropImageService implements cropImageServiceInterface {
         $iUploadeFileSize = 0;
         $aAllowedFileTypes = array();
 
-        if ($imageUploadSettings == NULL) {
-            $uploadFolder = $this->config['imageUploadSettings']['uploadFolder'];
-        } else {
-            $uploadFolder = $imageUploadSettings['uploadFolder'];
-        }
+        $uploadFolder = $this->config['imageUploadSettings'][$imageUploadSettings]['uploadFolder'];
 
         $sUploadFolder = 'public/' . $uploadFolder;
-        $iUploadeFileSize = (int) $this->config['imageUploadSettings']['uploadeFileSize'];
-        $aAllowedFileTypes = $this->config['imageUploadSettings']['allowedImageTypes'];
+        $iUploadeFileSize = (int) $this->config['imageUploadSettings'][$imageUploadSettings]['uploadeFileSize'];
+        $aAllowedFileTypes = $this->config['imageUploadSettings'][$imageUploadSettings]['allowedImageTypes'];
 
 
         //Target directory with file name
@@ -248,15 +244,16 @@ class cropImageService implements cropImageServiceInterface {
         switch ($sMimeType) {
             case "image/jpeg":
                 $img_r = imagecreatefromjpeg($srcFile);
-                $dst_r = ImageCreateTrueColor($dw, $dh);
+                $dst_r = imagecreatetruecolor($dw, $dh);
                 imagecopyresampled($dst_r, $img_r, 0, 0, $x, $y, $dw, $dh, $w, $h);
                 imagejpeg($dst_r, $dstFile . $sFileName, $img_quality);
                 break;
             case "image/png":
+                
+                $dst_r = imagecreatetruecolor($dw, $dh);
                 $img_r = imagecreatefrompng($srcFile);
-                $dst_r = ImageCreateTrueColor($dw, $dh);
-
-                $oTransparentIndex = imagecolortransparent($srcFile);
+                $alpha_channel = imagecolorallocatealpha($img_r, 0, 0, 0, 127); 
+                $oTransparentIndex = imagecolortransparent($img_r);
                 imagealphablending($dst_r, false);
                 imagesavealpha($dst_r, true);
                 $oTransparent = imagecolorallocatealpha($dst_r, 255, 255, 255, 127);

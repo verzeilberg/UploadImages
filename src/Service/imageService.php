@@ -62,11 +62,12 @@ class imageService implements imageServiceInterface {
     public function deleteImage($image = NULL) {
         if (is_object($image)) {
             $imageTypes = $image->getImageTypes();
+            
             foreach ($imageTypes AS $imageType) {
                 @unlink('public/' . $imageType->getFolder() . $imageType->getFileName());
                 $this->em->remove($imageType);
-                $this->em->flush();
             }
+            
             $this->em->remove($image);
             $this->em->flush();
             return true;
