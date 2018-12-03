@@ -5,77 +5,144 @@ namespace UploadImages\Service;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Session\Container;
 
-/*
- * Entities
- */
+class cropImageService implements cropImageServiceInterface
+{
 
-//use UploadImages\Entity\Image;
-//use UploadImages\Entity\ImageType;
-
-class cropImageService implements cropImageServiceInterface {
-
-    /**
-     * @var \Blog\Service\PostServiceInterface
-     */
     protected $config;
     protected $em;
 
-    public function __construct($em, $config) {
+    public function __construct($em, $config)
+    {
         $this->config = $config;
         $this->em = $em;
     }
 
-    public function uploadImage($image, $imageUploadSettings = 'default', $imageType = 'original', $Image = NULL, $isOriginal = 0) {
-
-        //Check if provided image ia an array
+    public function uploadImage($image, $imageUploadSettingsKey = 'default', $imageType = 'original', $imageObject = NULL, $isOriginal = 0)
+    {
+        /**
+         *
+         * Check if $image is array
+         *
+         * @param image $image array
+         * @return void
+         *
+         */
         if (!is_array($image)) {
-            return $this->translate('File is not a image');
+            return 'File is not a image';
         }
 
-        $sUploadFolder = '';
-        $iUploadeFileSize = 0;
         $aAllowedFileTypes = array();
 
-        $uploadFolder = $this->config['imageUploadSettings'][$imageUploadSettings]['uploadFolder'];
+        /**
+         * Set imageUploadSettings from config in variable
+         */
+        $imageUploadSettings = $this->config['imageUploadSettings'];
 
-        $sUploadFolder = 'public/' . $uploadFolder;
-        $iUploadeFileSize = (int) $this->config['imageUploadSettings'][$imageUploadSettings]['uploadeFileSize'];
-        $aAllowedFileTypes = $this->config['imageUploadSettings'][$imageUploadSettings]['allowedImageTypes'];
+        /**
+         *
+         * Check if uploadsettings excists in config array
+         *
+         * @param $imageUploadSettings string
+         * @param $imageUploadSettings
+         * @return void
+         *
+         */
+        if (!array_key_exists($imageUploadSettingsKey, $imageUploadSettings)) {
+            return 'Given settings does not excists';
+        }
+
+        /**
+         * Set upload folder in variable
+         */
+        $uploadFolder = $imageUploadSettings[$imageUploadSettingsKey]['uploadFolder'];
+
+        /**
+         *
+         * Check if upload folder is set in config array
+         *
+         * @param $uploadFolder string
+         * @return void
+         *
+         */
+        if (empty($uploadFolder)) {
+            return 'Upload folder not set';
+        }
+
+        /**
+         * Set public before upload folder
+         */
+        $uploadFolder = 'public/' . $uploadFolder;
+
+        /**
+         * Set upload file size in variable
+         */
+        $uploadFileSize = (int)$imageUploadSettings[$imageUploadSettingsKey]['uploadeFileSize'];
+
+        /**
+         *
+         * Check if upload file size
+         *
+         * @param $uploadFileSize integer
+         * @return void
+         *
+         */
+        if (empty($uploadFileSize)) {
+            return 'File size not set';
+        }
+
+        /**
+         * Set allowed file types in variable
+         */
+        $allowedFileTypes = $imageUploadSettings[$imageUploadSettingsKey]['allowedImageTypes'];
 
 
+        /**
+         * Set targetfile
+         */
         //Target directory with file name
-        $target_file = $sUploadFolder . basename($image["name"]);
-        $imageFileType = pathinfo($target_file, PATHINFO_EXTENSION);
+        $targetFile = $uploadFolder . basename($image["name"]);
 
-        // Check if image file is a actual image or fake image
+        /**
+         * Check if file is a real file and not fake
+         */
         $check = getimagesize($image["tmp_name"]);
         if ($check === false) {
-            return $this->translate('File is not a image');
+            return 'File is not a image';
         }
 
-        // Check if folder excists and has the apropiete rights otherwise create and give rights
-        if (!file_exists($sUploadFolder)) {
-            mkdir($sUploadFolder, 0777, true);
-        } elseif (!is_writable($sUploadFolder)) {
-            chmod($sUploadFolder, 0777);
+        /**
+         * Check if folder excists and has the apropiate rights otherwise create and give rights
+         */
+        if (!file_exists($uploadFolder)) {
+            mkdir($uploadFolder, 0777, true);
+        } elseif (!is_writable($uploadFolder)) {
+            chmod($uploadFolder, 0777);
         }
-        // Check if image file already exists
-        if (file_exists($target_file)) {
+
+        /**
+         * Check if file  excists
+         */
+        if (file_exists($targetFile)) {
             return 'File already excist';
         }
-        // Check image file size
-        if ($image["size"] > $iUploadeFileSize) {
+
+        //@todo Rewrite name if file excists
+
+        /**
+         * Check if file sie is not exceeded
+         */
+        if ($image["size"] > $uploadFileSize) {
             return 'Image not saved. File size exceeded';
         }
 
-
-        $imageFileType = strtolower($imageFileType);
-        // Allow certain file formats
-        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg" && $imageFileType != "gif") {
-            return 'Sorry, only JPG, JPEG, PNG & GIF files are allowed.';
+        /*
+         * Check if mime type is allowed for this upload
+         */
+        if (!in_array($image['type'], $allowedFileTypes)) {
+            return 'File extension is not allowed';
         }
 
-        if (copy($image["tmp_name"], $target_file)) {
+        if (copy($image["tmp_name"], $targetFile)) {
 
             list($width, $height, $type, $attr) = getimagesize($image["tmp_name"]);
 
@@ -85,14 +152,17 @@ class cropImageService implements cropImageServiceInterface {
             $ImageFile['imgW'] = $width;
             $ImageFile['imgH'] = $height;
 
-            //Create Image type
-            return $this->createImageType($ImageFile, $imageType, $Image, 0, $isOriginal);
+            /**
+             * Create Image type
+             */
+            return $this->createImageType($ImageFile, $imageType, $imageObject, 0, $isOriginal);
         } else {
             return 'Sorry, there was an error uploading your file.';
         }
     }
 
-    public function resizeAndCropImage($sOriLocation = null, $sDestinationFolder = null, $iImgWidth = null, $iImgHeight = null, $imageType = 'original', $Image = null) {
+    public function resizeAndCropImage($sOriLocation = null, $sDestinationFolder = null, $iImgWidth = null, $iImgHeight = null, $imageType = 'original', $imageObject = null)
+    {
 
         // Check if file exist
         if (!file_exists($sOriLocation)) {
@@ -104,15 +174,15 @@ class cropImageService implements cropImageServiceInterface {
             $sDestinationFolder = dirname($sOriLocation);
         }
 
-        // Check if the destination folder exist
-        if (!is_dir($sDestinationFolder)) {
-            return 'Folder ' . $sDestinationFolder . ' does not exist';
+        /**
+         * Check if folder exists and has the appropiate rights otherwise create and give rights
+         */
+        if (!file_exists($sDestinationFolder)) {
+            mkdir($sDestinationFolder, 0777, true);
+        } elseif (!is_writable($sDestinationFolder)) {
+            chmod($sDestinationFolder, 0777);
         }
 
-        // Check if the directory has the appropiate rights
-        if (substr(sprintf('%o', fileperms($sDestinationFolder)), -4) <> '0777') {
-            return 'The folder does not has the appropirate rights to upload files.';
-        }
 
         /*
           // Check is the file size is not to big Smaller than 50 mb
@@ -208,12 +278,13 @@ class cropImageService implements cropImageServiceInterface {
 
 
         //Create Image type
-        return $this->createImageType($ImageFile, $imageType, $Image);
+        return $this->createImageType($ImageFile, $imageType, $imageObject);
 
         // return $ImageFile;
     }
 
-    public function CropImage($srcFile = null, $dstFile = null, $x, $y, $w, $h, $dw, $dh, $img_quality = 90) {
+    public function CropImage($srcFile = null, $dstFile = null, $x, $y, $w, $h, $dw, $dh, $img_quality = 90)
+    {
 
         // Check if file exist
         if (!file_exists($srcFile)) {
@@ -226,13 +297,17 @@ class cropImageService implements cropImageServiceInterface {
         }
 
         // Check if the destination folder exist
-        if (!is_dir($dstFile)) {
-            return 'Folder ' . $dstFile . ' does not exist';
-        }
+        //if (!is_dir($dstFile)) {
+            //return 'Folder ' . $dstFile . ' does not exist';
+       // }
 
-        // Check if the directory has the appropiate rights
-        if (substr(sprintf('%o', fileperms($dstFile)), -4) <> '0777') {
-            return 'The folder does not has the appropriate rights to upload files.';
+        /**
+         * Check if folder excists and has the apropiate rights otherwise create and give rights
+         */
+        if (!file_exists($dstFile)) {
+            mkdir($dstFile, 0777, true);
+        } elseif (!is_writable($dstFile)) {
+            chmod($dstFile, 0777);
         }
 
         //get file info like basename and mime type of the file
@@ -249,10 +324,10 @@ class cropImageService implements cropImageServiceInterface {
                 imagejpeg($dst_r, $dstFile . $sFileName, $img_quality);
                 break;
             case "image/png":
-                
+
                 $dst_r = imagecreatetruecolor($dw, $dh);
                 $img_r = imagecreatefrompng($srcFile);
-                $alpha_channel = imagecolorallocatealpha($img_r, 0, 0, 0, 127); 
+                $alpha_channel = imagecolorallocatealpha($img_r, 0, 0, 0, 127);
                 $oTransparentIndex = imagecolortransparent($img_r);
                 imagealphablending($dst_r, false);
                 imagesavealpha($dst_r, true);
@@ -281,7 +356,8 @@ class cropImageService implements cropImageServiceInterface {
         return true;
     }
 
-    public function setImageUploadSettings($imageUploadSettings) {
+    public function setImageUploadSettings($imageUploadSettings)
+    {
         if ($imageUploadSettings === NULL) {
             $this->imageUploadSettings = $this->getServiceLocator()->get('config');
         } else {
@@ -304,19 +380,21 @@ class cropImageService implements cropImageServiceInterface {
         }
     }
 
-    public function createImage() {
+    public function createImage()
+    {
         $image = new \UploadImages\Entity\Image();
 
         return $image;
     }
 
-    public function createImageType($ImageFile = NULL, $imageTypeN = NULL, $Image = NULL, $crop = 0, $isOriginal = 0) {
+    public function createImageType($ImageFile = NULL, $imageTypeN = NULL, $imageObject = NULL, $crop = 0, $isOriginal = 0)
+    {
         if (is_array($ImageFile) && !empty($imageTypeN)) {
 
             $imageFiles = array();
 
-            if (!is_object($Image)) {
-                $Image = $this->createImage();
+            if (!is_object($imageObject)) {
+                $imageObject = $this->createImage();
             }
 
             $fileName = $ImageFile['imageFileName'];
@@ -335,15 +413,15 @@ class cropImageService implements cropImageServiceInterface {
 
 
             //Save image type
-            $Image->addImageType($imageType);
+            $imageObject->addImageType($imageType);
             $this->em->persist($imageType);
 
             //Save image
-            $this->em->persist($Image);
+            $this->em->persist($imageObject);
             $this->em->flush();
 
             $imageFiles['imageType'] = $imageType;
-            $imageFiles['image'] = $Image;
+            $imageFiles['image'] = $imageObject;
 
             return $imageFiles;
         } else {
@@ -351,7 +429,8 @@ class cropImageService implements cropImageServiceInterface {
         }
     }
 
-    public function createCropArray($imageType = NULL, $folderOriginal = NULL, $fileName = NULL, $destinationFolder = NULL, $ImgW = NULL, $ImgH = NULL, $image = NULL, $cropImages = NULL) {
+    public function createCropArray($imageType = NULL, $folderOriginal = NULL, $fileName = NULL, $destinationFolder = NULL, $ImgW = NULL, $ImgH = NULL, $image = NULL, $cropImages = NULL)
+    {
         $cropimage = array();
 
         $cropimage['imageType'] = $imageType;
@@ -373,7 +452,8 @@ class cropImageService implements cropImageServiceInterface {
         return $imageFiles;
     }
 
-    public function createReCropArray($imageType = NULL, $folderOriginal = NULL, $fileName = NULL, $destinationFolder = NULL, $ImgW = NULL, $ImgH = NULL, $cropImages = NULL) {
+    public function createReCropArray($imageType = NULL, $folderOriginal = NULL, $fileName = NULL, $destinationFolder = NULL, $ImgW = NULL, $ImgH = NULL, $cropImages = NULL)
+    {
         $cropimage = [];
 
         $cropimage['imageType'] = $imageType;
@@ -391,7 +471,8 @@ class cropImageService implements cropImageServiceInterface {
         return $cropImages;
     }
 
-    public function createReturnURL($route = NULL, $action = NULL, $id = NULL) {
+    public function createReturnURL($route = NULL, $action = NULL, $id = NULL)
+    {
         $returnURL = array();
         if (!empty($route)) {
             $returnURL['route'] = $route;
@@ -407,7 +488,8 @@ class cropImageService implements cropImageServiceInterface {
         }
     }
 
-    public function createContainerImages($cropImages = NULL, $returnURL = NULL) {
+    public function createContainerImages($cropImages = NULL, $returnURL = NULL)
+    {
         $container = new Container('cropImages');
         $container->cropimages = $cropImages;
         $container->returnUrl = $returnURL;
