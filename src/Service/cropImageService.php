@@ -5,6 +5,11 @@ namespace UploadImages\Service;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Session\Container;
 
+/*
+ * Entities
+ */
+use UploadImages\Entity\Image;
+
 class cropImageService implements cropImageServiceInterface
 {
 
@@ -161,6 +166,25 @@ class cropImageService implements cropImageServiceInterface
         }
     }
 
+    /**
+     * Resize and/or crops a image
+     *
+     * @param string $sOriLocation
+     * Original location of the file
+     * @param string $sDestinationFolder
+     * Destination location of the file
+     * @param integer $iImgWidth
+     * The new width of the image
+     * @param integer $iImgHeight
+     * The new height of the image
+     * @param string $imageType
+     * Type of the image
+     * @param object $imageObject
+     * Image object for further use
+     *
+     * @return bool true if the filename exists and is
+     * writable.
+     */
     public function resizeAndCropImage($sOriLocation = null, $sDestinationFolder = null, $iImgWidth = null, $iImgHeight = null, $imageType = 'original', $imageObject = null)
     {
 
@@ -448,8 +472,7 @@ class cropImageService implements cropImageServiceInterface
 
     public function createImage()
     {
-        $image = new \UploadImages\Entity\Image();
-
+        $image = new Image();
         return $image;
     }
 
