@@ -195,9 +195,7 @@ class cropImageService implements cropImageServiceInterface
 
 
         $sPathParts = pathinfo($sOriLocation);
-
         $sFileName = $sPathParts['basename'];
-
         $sMimeType = mime_content_type($sOriLocation);
 
         // Depending on wich file type is uploaded create a image
@@ -355,30 +353,98 @@ class cropImageService implements cropImageServiceInterface
 
         return true;
     }
-
-    public function setImageUploadSettings($imageUploadSettings)
+    
+    public function ResizeImage($srcFile = null, $dstFile = null, $dw = null, $dh = null, $imageType = null, $imageObject = null,  $img_quality = 90)
     {
-        if ($imageUploadSettings === NULL) {
-            $this->imageUploadSettings = $this->getServiceLocator()->get('config');
-        } else {
-
-            $formatArray = array(
-                'uploadFolder' => 'public/img/userFiles/',
-                'uploadeFileSize' => '5000000000000000',
-                'allowedImageTypes' => array(
-                    'jpg',
-                    'png',
-                    'gif'
-                )
-            );
-
-            if (array_diff($formatArray, $imageUploadSettings)) {
-                return false;
-            }
-
-            $this->imageUploadSettings = $imageUploadSettings;
+        // Check if file exist
+        if (!file_exists($srcFile)) {
+            return 'Could not find the original image';
         }
+
+        // Check if the destionfolder is set. When false than Original location becomes Destination folder
+        if ($dstFile == null) {
+            $dstFile = dirname($srcFile);
+        }
+
+        /**
+         * Check if folder excists and has the apropiate rights otherwise create and give rights
+         */
+        if (!file_exists($dstFile)) {
+            mkdir($dstFile, 0777, true);
+        } elseif (!is_writable($dstFile)) {
+            chmod($dstFile, 0777);
+        }
+        
+        //get file info like basename and mime type of the file
+        $sPathParts = pathinfo($srcFile);
+        $sFileName = $sPathParts['basename'];
+        $sMimeType = mime_content_type($srcFile);
+        list($currentWidth, $currentHeight) = getimagesize($srcFile);
+        
+        
+        if(!empty($dw) && !empty($dh)) {
+            $newWidth = $dw;
+            $newHeight = $dh;
+        } else if (!empty($dw) || empty($dh)) {
+            $newWidth = $dw;
+            $ratio = (100 * $dw) / $currentWidth;
+            $newHeight = ($currentHeight / 100) * $ratio;
+        } else if (empty($dw) || !empty($dh)) {
+            $newHeight = $dh;
+            $ratio = (100 * $dh) / $currentHeight;
+            $newWidth = ($currentWidth / 100) * $ratio;
+        }
+        
+        // Switch between jpg, png or gif
+        switch ($sMimeType) {
+            case "image/jpeg":
+                $img_r = imagecreatefromjpeg($srcFile);
+                $dst_r = imagecreatetruecolor($newWidth, $newHeight);
+                imagecopyresampled($dst_r, $img_r, 0, 0, 0, 0, $newWidth, $newHeight, $currentWidth, $currentHeight);
+                imagejpeg($dst_r, $dstFile . $sFileName, $img_quality);
+                break;
+            case "image/png":
+
+                $dst_r = imagecreatetruecolor($newWidth, $newHeight);
+                $img_r = imagecreatefrompng($srcFile);
+                $alpha_channel = imagecolorallocatealpha($img_r, 0, 0, 0, 127);
+                $oTransparentIndex = imagecolortransparent($img_r);
+                imagealphablending($dst_r, false);
+                imagesavealpha($dst_r, true);
+                $oTransparent = imagecolorallocatealpha($dst_r, 255, 255, 255, 127);
+                imagefilledrectangle($dst_r, 0, 0, $newWidth, $newHeight, $oTransparent);
+
+
+                imagecopyresampled($dst_r, $img_r, 0, 0, 0, 0, $newWidth, $newHeight, $currentWidth, $currentHeight);
+                imagepng($dst_r, $dstFile . $sFileName, 9);
+                break;
+            case "image/gif":
+                $img_r = imagecreatefromgif($srcFile);
+                $dst_r = ImageCreateTrueColor($newWidth, $newHeight);
+
+                $oTransparentIndex = imagecolortransparent($srcFile);
+                imagepalettecopy($srcFile, $dst_r);
+                imagefill($dst_r, 0, 0, $oTransparentIndex);
+                imagecolortransparent($dst_r, $oTransparentIndex);
+                imagetruecolortopalette($dst_r, true, 256);
+
+                imagecopyresampled($dst_r, $img_r, 0, 0, 0, 0, $newWidth, $newHeight, $currentWidth, $currentHeight);
+                imagegif($dst_r, $dstFile . $sFileName);
+                break;
+        }
+        
+        $ImageFile = array();
+        $ImageFile['imageFileName'] = $sFileName;
+        $ImageFile['imageFolderName'] = $dstFile;
+        $ImageFile['imgW'] = $newWidth;
+        $ImageFile['imgH'] = $newHeight;
+
+
+        //Create Image type
+        return $this->createImageType($ImageFile, $imageType, $imageObject);
+
     }
+
 
     public function createImage()
     {

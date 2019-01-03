@@ -28,11 +28,4 @@ interface cropImageServiceInterface {
      */
     public function resizeAndCropImage($sOriLocation, $sDestinationFolder, $iImgWidth, $iImgHeight);
 
-    /**
-     * Should return a single blog post
-     *
-     * @param  int $id Identifier of the Post that should be returned
-     * @return PostInterface
-     */
-    public function setImageUploadSettings($imageUploadSettings);
 }
