@@ -11,10 +11,10 @@
                         echo '<img class="img-thumbnail" src="/' . $imageType->getFolder() . $imageType->getFileName() . '?v='.rand().'" alt="' . $image->getAlt() . '"/>';
                         ?>
                         <div class="imageOptions">
-                            <span data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm editImage glyphicon glyphicon-pencil" aria-hidden="true" data-dismiss="modal" data-target="#showImages"></span>
-                            <span data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm deleteImageObject glyphicon glyphicon-trash" aria-hidden="true"></span>
-                            <span data-id="<?php echo $returnURL['id'] ?>" data-route="<?php echo $returnURL['route'] ?>" data-action="<?php echo $returnURL['action'] ?>" data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm recropImage"><i class="fa fa-crop" aria-hidden="true"></i></span>
-                            <span data-id="<?php echo $returnURL['id'] ?>" data-route="<?php echo $returnURL['route'] ?>" data-action="<?php echo $returnURL['action'] ?>"  data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-primary btn-sm rotateImage"><i class="fa fa-undo" aria-hidden="true"></i></span>
+                            <span data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-secondary btn-sm editImage" data-dismiss="modal" data-target="#showImages"><i class="fas fa-edit"></i></span>
+                            <span data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-secondary btn-sm deleteImageObject"><i class="fas fa-trash"></i></span>
+                            <span data-id="<?php echo $returnURL['id'] ?>" data-route="<?php echo $returnURL['route'] ?>" data-action="<?php echo $returnURL['action'] ?>" data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-secondary btn-sm recropImage"><i class="fa fa-crop" aria-hidden="true"></i></span>
+                            <span data-id="<?php echo $returnURL['id'] ?>" data-route="<?php echo $returnURL['route'] ?>" data-action="<?php echo $returnURL['action'] ?>"  data-imageid="<?php echo $image->getImageId(); ?>" class="btn btn-secondary btn-sm rotateImage"><i class="fa fa-undo" aria-hidden="true"></i></span>
                         </div>
                     </div>
                 </div>
