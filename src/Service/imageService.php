@@ -5,6 +5,9 @@ namespace UploadImages\Service;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
+use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrineAdapter;
+use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
+use Zend\Paginator\Paginator;
 
 /*
  * Entities
@@ -168,21 +171,78 @@ class imageService implements imageServiceInterface {
                 }
             }
         }
+
         return $images;
+
+
+    }
+
+
+    /**
+     *
+     * Get array of images
+     *
+     * @return      query
+     *
+     */
+    public function getImages()
+    {
+
+        $qb = $this->em->getRepository(ImageType::class)->createQueryBuilder('i')
+            ->orderBy('i.fileName', 'DESC');
+        return $qb->getQuery();
     }
 
     /**
      *
-     * Get all images
+     * Get array of images  for pagination
+     * @var $items array
+     * @var $currentPage current page
+     * @var $itemsPerPage items on a page
      *
-     * @return   array
+     * @return      array
      *
      */
-    public function getImages() {
-        $images = $this->em->getRepository(ImageType::class)
-                ->findBy([], ['fileName' => 'DESC']);
+    public function createPaginationForArray($items, $currentPage = 1, $itemsPerPage = 10) {
+        $total = count( $items); //total items in array
+        $totalPages = ceil( $total/ $itemsPerPage ); //calculate total pages
+        $page = max($currentPage, 1); //get 1 page when $_GET['page'] <= 0
+        $page = min($page, $totalPages); //get last page when $_GET['page'] > $totalPages
+        $offset = ($page - 1) * $itemsPerPage;
+        if( $offset < 0 ) $offset = 0;
+        $previousPage = ($page == 1? 1:$currentPage - 1);
+        $nextPage = ($page == $totalPages? $totalPages:$currentPage + 1);
+        $images = array_slice( $items, $offset, $itemsPerPage );
 
-        return $images;
+        $result = [];
+        $pagination = [];
+        $pagination['currentPage'] = $currentPage;
+        $pagination['nextPage'] = $nextPage;
+        $pagination['previousPage'] = $previousPage;
+        $pagination['totalPages'] = $totalPages;
+        $result['images'] = $images;
+        $result['pagination'] = $pagination;
+
+        return $result;
+    }
+
+    /**
+     *
+     * Get array of languages  for pagination
+     * @var $query query
+     * @var $currentPage current page
+     * @var $itemsPerPage items on a page
+     *
+     * @return      array
+     *
+     */
+    public function getItemsForPagination($query, $currentPage = 1, $itemsPerPage = 10)
+    {
+        $adapter = new DoctrineAdapter(new ORMPaginator($query, false));
+        $paginator = new Paginator($adapter);
+        $paginator->setDefaultItemCountPerPage($itemsPerPage);
+        $paginator->setCurrentPageNumber($currentPage);
+        return $paginator;
     }
 
     /**

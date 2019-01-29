@@ -15,9 +15,11 @@ use Zend\Session\Container;
 /*
  * Entities
  */
+
 use UploadImages\Entity\Image;
 
-class UploadImagesController extends AbstractActionController {
+class UploadImagesController extends AbstractActionController
+{
 
     protected $cropImageService;
     protected $rotateImageService;
@@ -26,7 +28,8 @@ class UploadImagesController extends AbstractActionController {
     protected $em;
     protected $config;
 
-    public function __construct(cropImageServiceInterface $cropImageService, $rotateImageService, $vhm, $em, $imageService, $config) {
+    public function __construct(cropImageServiceInterface $cropImageService, $rotateImageService, $vhm, $em, $imageService, $config)
+    {
         $this->cropImageService = $cropImageService;
         $this->rotateImageService = $rotateImageService;
         $this->imageService = $imageService;
@@ -35,45 +38,53 @@ class UploadImagesController extends AbstractActionController {
         $this->config = $config;
     }
 
-    public function indexAction() {
+    public function indexAction()
+    {
         $this->layout('layout/beheer');
 
 
         return new ViewModel(
-                array(
-                )
+            array()
         );
     }
 
-    public function serverCheckAction() {
+    public function serverCheckAction()
+    {
         $this->layout('layout/beheer');
         $this->vhm->get('headScript')->appendFile('/js/uploadImages.js');
+        $page = $this->params()->fromQuery('page', 1);
         $rootPath = $this->config['imageUploadSettings']['rootPath'];
 
         $images = $this->imageService->getAllImageFromFolder($rootPath);
 
+        $result = $this->imageService->createPaginationForArray($images, $page, 10);
+
         return new ViewModel(
-                array(
-            'images' => $images,
-                )
+            array(
+                'images' => $result['images'],
+                'paginationSettings' => $result['pagination']
+            )
         );
     }
 
-    public function fileCheckAction() {
+    public function fileCheckAction()
+    {
         $this->layout('layout/beheer');
         $this->vhm->get('headScript')->appendFile('/js/uploadImages.js');
-        $rootPath = $this->config['imageUploadSettings']['rootPath'];
-        $images = $this->imageService->getImages();
+        $page = $this->params()->fromQuery('page', 1);
 
+        $query = $this->imageService->getImages();
+        $images = $this->imageService->getItemsForPagination($query, $page, 10);
 
         return new ViewModel(
-                array(
-            'images' => $images,
-                )
+            array(
+                'images' => $images,
+            )
         );
     }
 
-    public function cropAction() {
+    public function cropAction()
+    {
         $this->layout('layout/crop');
         $this->vhm->get('headScript')->appendFile('/js/jquery.Jcrop.min.js');
         $this->vhm->get('headLink')->appendStylesheet('/css/jCrop/jquery.Jcrop.min.css');
@@ -86,7 +97,7 @@ class UploadImagesController extends AbstractActionController {
         if (empty($aCropDetails)) {
             return $this->createRedirectLink($aReturnURL);
         }
-        
+
         //Get the first item in the array
         $oCropDetails = $aCropDetails[0];
 
@@ -94,13 +105,13 @@ class UploadImagesController extends AbstractActionController {
         $sImageToBeCropped = $oCropDetails['originalLink']; //link of the image that must be cropped
         $sCropReference = $oCropDetails['imageType']; //Reference of the crop
         $sDestionationFolderCroppedImage = $oCropDetails['destinationFolder']; //Folder where the image has to be saved
-        $iImgW = (int) $oCropDetails['ImgW']; //Image width
-        $iImgH = (int) $oCropDetails['ImgH']; //Image height
+        $iImgW = (int)$oCropDetails['ImgW']; //Image width
+        $iImgH = (int)$oCropDetails['ImgH']; //Image height
         // Get the widht and height of the orignal image        
         $aFileProps = getimagesize('public/' . $sImageToBeCropped);
 
-        $iWidth = (int) $aFileProps[0];
-        $iHeight = (int) $aFileProps[1];
+        $iWidth = (int)$aFileProps[0];
+        $iHeight = (int)$aFileProps[1];
 
         if ($iImgW > $iWidth || $iImgH > $iHeight) {
             array_shift($aCropDetails);
@@ -141,18 +152,19 @@ class UploadImagesController extends AbstractActionController {
         }
 
         return new ViewModel(
-                array(
-            'sCropReference' => $sCropReference,
-            'sImageToBeCropped' => $sImageToBeCropped,
-            'sDestionationFolderCroppedImage' => $sDestionationFolderCroppedImage,
-            'iXcrops' => $iXcrops,
-            'iImgW' => $iImgW,
-            'iImgH' => $iImgH
-                )
+            array(
+                'sCropReference' => $sCropReference,
+                'sImageToBeCropped' => $sImageToBeCropped,
+                'sDestionationFolderCroppedImage' => $sDestionationFolderCroppedImage,
+                'iXcrops' => $iXcrops,
+                'iImgW' => $iImgW,
+                'iImgH' => $iImgH
+            )
         );
     }
 
-    public function rotateAction() {
+    public function rotateAction()
+    {
         $this->layout('layout/rotate');
         $container = new Container('rotateImage');
         $aRotateDetails = $container->offsetGet('rotateImage');
@@ -161,10 +173,10 @@ class UploadImagesController extends AbstractActionController {
 
         if ($this->getRequest()->isPost()) {
             //Get rotation from form
-            $rotation = (int) $this->getRequest()->getPost()['rotation'];
-            
+            $rotation = (int)$this->getRequest()->getPost()['rotation'];
+
             if ($rotation != 0) {
-                foreach($aRotateImages AS $rotateImage) {
+                foreach ($aRotateImages AS $rotateImage) {
                     $imageToBeRotated = $rotateImage["folder"] . $rotateImage["fileName"];
                     $destionationFolderCroppedImage = 'public/' . $rotateImage["folder"];
                     $result = $this->rotateImageService->rotateImage('public/' . $imageToBeRotated, $destionationFolderCroppedImage, $rotation);
@@ -178,14 +190,15 @@ class UploadImagesController extends AbstractActionController {
 
 
         return new ViewModel(
-                array(
-            'aRotateDetails' => $aRotateDetails,
-            'aReturnURL' => $aReturnURL,
-                )
+            array(
+                'aRotateDetails' => $aRotateDetails,
+                'aReturnURL' => $aReturnURL,
+            )
         );
     }
 
-    public function createRedirectLink($aReturnURL = NULL) {
+    public function createRedirectLink($aReturnURL = NULL)
+    {
         if ($aReturnURL === NULL) {
             $this->redirect()->toRoute('home');
         } else {
