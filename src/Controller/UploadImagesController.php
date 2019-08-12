@@ -202,6 +202,9 @@ class UploadImagesController extends AbstractActionController
         if ($aReturnURL === NULL) {
             $this->redirect()->toRoute('home');
         } else {
+
+            var_dump($aReturnURL);
+
             $route = $aReturnURL['route'];
             unset($aReturnURL['route']);
             return $this->redirect()->toRoute($route, $aReturnURL);

@@ -573,7 +573,7 @@ class cropImageService implements cropImageServiceInterface
             }
             return $returnURL;
         } else {
-            return 'No route provided';
+            return $returnURL;
         }
     }
 
