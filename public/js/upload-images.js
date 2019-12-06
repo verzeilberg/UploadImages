@@ -40,9 +40,6 @@ $(document).ready(function () {
             url: "/ajaximage/getImage",
             async: true,
             success: function (data) {
-
-                console.log(data);
-
                 if (data.succes === true) {
                     $('input[name=editNameImage]').val(data.imageDetails.imageName);
                     $('input[name=editAlt]').val(data.imageDetails.imageAlt);
@@ -196,6 +193,7 @@ $(document).ready(function () {
             //Push object into array with index
             linksArr[index] = linkArr;
         });
+
         processLinksSvArray(linksArr);
     });
 
@@ -264,6 +262,7 @@ $(document).ready(function () {
             //Push object into array with index
             linksArr[index] = linkArr;
         });
+        console.log('ja');
         processLinksDbArray(linksArr);
     });
 

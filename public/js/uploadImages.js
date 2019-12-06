@@ -249,16 +249,27 @@ $(document).ready(function () {
             //Push object into array with index
             linksArr[index] = linkArr;
         });
+        $('button#break').removeAttr('disabled');
+        $('button#break').removeClass('disabled');
         processLinksDbArray(linksArr);
     });
 
+    /**
+     * Cance database image check
+     * @type {boolean}
+     */
+    var breaking = false;
+    $("#break").on("click", function () {
+        breaking = true;
+    });
     /*
      * Proccess the given array
-     * 
+     *
      * @return void
      */
+
     function processLinksDbArray(linksArr) {
-        if (linksArr.length > 0) {
+        if (linksArr.length > 0 && breaking === false) {
             var id = linksArr[0]['id'];
             var name = linksArr[0]['name'];
             var folder = linksArr[0]['folder'];
@@ -266,14 +277,17 @@ $(document).ready(function () {
             var linksArr = $.grep(linksArr, function (e) {
                 return e.id != id;
             });
-
             processLinksDbArrayAjax(linksArr, id, name, folder);
+        } else {
+            $('button#break').attr('disabled', 'disabled');
+            $('button#break').addClass('disabled');
+            breaking = false;
         }
     }
 
     /*
      * Execute ajax call to check if image in db is on the server
-     * 
+     *
      * @return void
      */
     function processLinksDbArrayAjax(linksArr, id, name, folder) {
@@ -302,7 +316,7 @@ $(document).ready(function () {
 
     /*
      * Ajax function to delete image from server
-     * 
+     *
      * @return void
      */
     $(document).on("click", "span.deleteImage", function () {
