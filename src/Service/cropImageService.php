@@ -2,8 +2,8 @@
 
 namespace UploadImages\Service;
 
-use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Session\Container;
+use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\Session\Container;
 
 /*
  * Entities

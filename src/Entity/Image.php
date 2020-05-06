@@ -3,7 +3,7 @@
 namespace UploadImages\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Zend\Form\Annotation;
+use Laminas\Form\Annotation;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -23,7 +23,7 @@ class Image {
 
     /**
      * @Annotation\Required(false)
-     * @Annotation\Type("Zend\Form\Element\File")
+     * @Annotation\Type("Laminas\Form\Element\File")
      * * @Annotation\Options({
      * "label": "Upload afbeelding",
      * "label_attributes": {"class": "col-sm-4 col-md-4 col-lg-4 control-label"}

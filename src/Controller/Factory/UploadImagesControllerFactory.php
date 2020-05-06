@@ -3,7 +3,7 @@
 namespace UploadImages\Controller\Factory;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use UploadImages\Service\cropImageService;
 use UploadImages\Service\rotateImageService;
 use UploadImages\Service\imageService;
