@@ -2,9 +2,9 @@
 
 namespace UploadImages\Service;
 
+use Laminas\Form\Annotation\AnnotationBuilder;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
-use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
+use Doctrine\Laminas\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Paginator\Adapter\DoctrinePaginator as DoctrineAdapter;
 use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Laminas\Paginator\Paginator;
