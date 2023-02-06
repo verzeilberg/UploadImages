@@ -33,6 +33,7 @@ class cropImageService implements cropImageServiceInterface
          *
          */
         if (!is_array($image)) {
+
             return 'File is not a image';
         }
 
@@ -100,7 +101,6 @@ class cropImageService implements cropImageServiceInterface
          */
         $allowedFileTypes = $imageUploadSettings[$imageUploadSettingsKey]['allowedImageTypes'];
 
-
         /**
          * Set targetfile
          */
@@ -156,12 +156,14 @@ class cropImageService implements cropImageServiceInterface
             $ImageFile['imageFolderName'] = $uploadFolder;
             $ImageFile['imgW'] = $width;
             $ImageFile['imgH'] = $height;
-
             /**
              * Create Image type
              */
             return $this->createImageType($ImageFile, $imageType, $imageObject, 0, $isOriginal);
         } else {
+
+            die(' c');
+
             return 'Sorry, there was an error uploading your file.';
         }
     }

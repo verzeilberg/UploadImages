@@ -1,45 +1,57 @@
 <!-- Image upload -->
+<?php
+$fieldset = $form->get('upload-image');
+$image = $fieldset->get('image');
+?>
 <hr/>
 <h2>Afbeelding toevoegen</h2>
 <div class="form-group row mt-3 mb-3">
-    <?php echo $this->formLabel($formImage->get('image')); ?>
+    <?= $this->formLabel($image) ?>
     <div class="col-sm-6 col-md-6 col-lg-6">
             <label class="sr-only" for="inlineFormInputGroup">Username</label>
             <div class="input-group mb-2">
                 <div class="input-group-prepend input-group-addon">
                     <label class="input-group-text  btn btn-primary btn-file">
-                        Browse&hellip; <input type="file" name="image" style="display: none;" multiple>
+                        Browse&hellip; <?= $this->formElement($image) ?>
                     </label>
                 </div>
                 <input type="text" class="form-control" name="fileUploadFileName" readonly>
             </div>
     </div>
 </div>
+<?php
+$nameImage = $fieldset->get('nameImage');
+?>
 <div class="form-group row">
-    <?php echo $this->formLabel($formImage->get('nameImage')); ?>
+    <?= $this->formLabel($nameImage) ?>
     <div class="col-sm-6 col-md-6 col-lg-6">
-        <?php echo $this->formText($formImage->get('nameImage')); ?>
+        <?= $this->formElement($nameImage) ?>
     </div>
     <div class="col-sm-6 col-md-6 col-lg-6">
-        <?php echo (count($formImage->getMessages('nameImage')) > 0 ? $formImage->getMessages('nameImage')['isEmpty'] : '&nbsp;' ) ?>
+
     </div>
 </div>
+<?php
+$alt = $fieldset->get('alt');
+?>
 <div class="form-group row">
-    <?php echo $this->formLabel($formImage->get('alt')); ?>
+    <?= $this->formLabel($alt) ?>
     <div class="col-sm-6 col-md-6 col-lg-6">
-        <?php echo $this->formText($formImage->get('alt')); ?>
+        <?= $this->formElement($alt) ?>
     </div>
     <div class="col-sm-6 col-md-6 col-lg-6">
-        <?php echo (count($formImage->getMessages('alt')) > 0 ? $formImage->getMessages('alt')['isEmpty'] : '&nbsp;' ) ?>
+
     </div>
 </div>
+<?php
+$descriptionImage = $fieldset->get('descriptionImage');
+?>
 <div class="form-group row">
-    <?php echo $this->formLabel($formImage->get('descriptionImage')); ?>
+    <?= $this->formLabel($descriptionImage) ?>
     <div class="col-sm-6 col-md-6 col-lg-6">
-        <?php echo $this->formText($formImage->get('descriptionImage')); ?>
+        <?= $this->formElement($descriptionImage) ?>
     </div>
     <div class="col-sm-6 col-md-6 col-lg-6">
-        <?php echo (count($formImage->getMessages('descriptionImage')) > 0 ? $formImage->getMessages('descriptionImage')['isEmpty'] : '&nbsp;' ) ?>
     </div>
 </div>
 <hr/>
