@@ -1,4 +1,4 @@
-//Create well design file upload form file
+g//Create well design file upload form file
 $(document).on('change', ':file', function () {
     var input = $(this),
             numFiles = input.get(0).files ? input.get(0).files.length : 1,
@@ -29,7 +29,7 @@ $(document).ready(function () {
     $("span.editImage").on("click", function () {
 
         $(function () {
-            $('#editImage').modal('toggle');
+            $('#editImageModal').modal('toggle');
         });
         var imageId = $(this).data('imageid');
         $.ajax({

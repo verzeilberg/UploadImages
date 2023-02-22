@@ -1,12 +1,8 @@
 $(document).ready(function () {
-//Open model afbeeldingen
-    $('#showImages').on('shown.bs.modal', function () {
-    });
-
 //When modal edit afbeelding close open afbeeldingen modal
-    $('#editImage').on('hidden.bs.modal', function () {
+    $('#editImageModal').on('hidden.bs.modal', function () {
         $(function () {
-            $('#showImages').modal('toggle');
+            $('#editImageModal').modal('toggle');
         });
         $('input[name=editNameImage]').val('');
         $('input[name=editAlt]').val('');
@@ -18,7 +14,7 @@ $(document).ready(function () {
     $("span.editImage").on("click", function () {
 
         $(function () {
-            $('#editImage').modal('toggle');
+            $('#editImageModal').modal('toggle');
         });
         var imageId = $(this).data('imageid');
         $.ajax({
@@ -61,9 +57,8 @@ $(document).ready(function () {
             success: function (data) {
                 if (data.succes === true) {
                     $(function () {
-                        $('#editImage').modal('toggle');
+                        $('#editImageModals').modal('toggle');
                     });
-
                 } else {
                     alert(data.errorMessage);
                 }
