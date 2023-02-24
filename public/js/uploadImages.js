@@ -2,7 +2,7 @@ $(document).ready(function () {
 //When modal edit afbeelding close open afbeeldingen modal
     $('#editImageModal').on('hidden.bs.modal', function () {
         $(function () {
-            $('#editImageModal').modal('toggle');
+            $('#imageModal').modal('toggle');
         });
         $('input[name=editNameImage]').val('');
         $('input[name=editAlt]').val('');
@@ -10,10 +10,10 @@ $(document).ready(function () {
     })
 
 
-//Ajax function to edit Image
+    //Ajax function to edit Image
     $("span.editImage").on("click", function () {
-
         $(function () {
+            $('#imageModal').modal('toggle');
             $('#editImageModal').modal('toggle');
         });
         var imageId = $(this).data('imageid');
@@ -35,10 +35,9 @@ $(document).ready(function () {
                 }
             }
         });
-
     });
 
-//Ajax function to save edited image
+    //Ajax function to save edited image
     $("button#saveImageDetails").on("click", function () {
         var imageId = $('input[name=imageId]').val();
         var nameImage = $('input[name=editNameImage]').val();
@@ -56,8 +55,11 @@ $(document).ready(function () {
             async: true,
             success: function (data) {
                 if (data.succes === true) {
+
+                    console.log(' test');
+
                     $(function () {
-                        $('#editImageModals').modal('toggle');
+                        $('#editImageModal').modal('toggle');
                     });
                 } else {
                     alert(data.errorMessage);
@@ -67,7 +69,7 @@ $(document).ready(function () {
     });
 
 
-//Ajax function to delete image 
+    //Ajax function to delete image
     $("span.deleteImageObject").on("click", function () {
         var imageId = $(this).data('imageid');
         $.ajax({
@@ -89,7 +91,7 @@ $(document).ready(function () {
         });
     });
 
-//Ajax function to recrop image
+    //Ajax function to recrop image
     $("span.recropImage").on("click", function () {
         var imageId = $(this).data('imageid');
         var route = $(this).data('route');
