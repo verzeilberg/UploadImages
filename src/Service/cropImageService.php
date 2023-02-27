@@ -9,7 +9,7 @@ use Laminas\Session\Container;
  * Entities
  */
 use UploadImages\Entity\Image;
-use UploadImages\Exception\ImageException;
+use UploadImages\Exception\fileException;
 
 class cropImageService implements cropImageServiceInterface
 {
@@ -35,7 +35,7 @@ class cropImageService implements cropImageServiceInterface
          */
         if (!is_array($image)) {
 
-            return new ImageException('File is not a image');
+            return new fileException('File is not a image');
         }
 
         $aAllowedFileTypes = array();
@@ -55,7 +55,7 @@ class cropImageService implements cropImageServiceInterface
          *
          */
         if (!array_key_exists($imageUploadSettingsKey, $imageUploadSettings)) {
-            return new ImageException('Given settings does not excists');
+            return new fileException('Given settings does not excists');
         }
 
         /**
@@ -72,7 +72,7 @@ class cropImageService implements cropImageServiceInterface
          *
          */
         if (empty($uploadFolder)) {
-            return new ImageException('Upload folder not set');
+            return new fileException('Upload folder not set');
         }
 
         /**
@@ -94,7 +94,7 @@ class cropImageService implements cropImageServiceInterface
          *
          */
         if (empty($uploadFileSize)) {
-            return new ImageException('File size not set');
+            return new fileException('File size not set');
         }
 
         /**
@@ -113,7 +113,7 @@ class cropImageService implements cropImageServiceInterface
          */
         $check = getimagesize($image["tmp_name"]);
         if ($check === false) {
-            return new ImageException('File is not a image');
+            return new fileException('File is not a image');
         }
 
         /**
