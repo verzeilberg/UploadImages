@@ -10,6 +10,7 @@ use Laminas\Session\Container;
  */
 use UploadImages\Entity\Image;
 use UploadImages\Exception\fileException;
+use UploadImages\Exception\ImageException;
 
 class cropImageService implements cropImageServiceInterface
 {
@@ -17,155 +18,120 @@ class cropImageService implements cropImageServiceInterface
     protected $config;
     protected $em;
 
+    /**
+     * @param $em
+     * @param $config
+     */
     public function __construct($em, $config)
     {
         $this->config = $config;
         $this->em = $em;
     }
 
+    /**
+     * @throws ImageException
+     */
     public function uploadImage($image, $imageUploadSettingsKey = 'default', $imageType = 'original', $imageObject = NULL, $isOriginal = 0)
     {
         /**
-         *
-         * Check if $image is array
-         *
+         * Check if $image is arrayed
          * @param image $image array
          * @return void
-         *
          */
         if (!is_array($image)) {
-
-            return new fileException('File is not a image');
+            throw new ImageException('File is not a image');
         }
 
-        $aAllowedFileTypes = array();
+        $aAllowedFileTypes = [];
 
-        /**
-         * Set imageUploadSettings from config in variable
-         */
+        /** Set imageUploadSettings from config in variable */
         $imageUploadSettings = $this->config['imageUploadSettings'];
 
         /**
-         *
          * Check if uploadsettings excists in config array
-         *
          * @param $imageUploadSettings string
          * @param $imageUploadSettings
          * @return void
-         *
          */
         if (!array_key_exists($imageUploadSettingsKey, $imageUploadSettings)) {
-            return new fileException('Given settings does not excists');
+            throw new ImageException('Given settings does not excists');
         }
 
-        /**
-         * Set upload folder in variable
-         */
+        /** Set upload folder in variable */
         $uploadFolder = $imageUploadSettings[$imageUploadSettingsKey]['uploadFolder'];
 
         /**
-         *
          * Check if upload folder is set in config array
-         *
          * @param $uploadFolder string
          * @return void
-         *
          */
         if (empty($uploadFolder)) {
-            return new fileException('Upload folder not set');
+            throw new ImageException('Upload folder not set');
         }
 
-        /**
-         * Set public before upload folder
-         */
+        /** Set public before upload folder */
         $uploadFolder = 'public/' . $uploadFolder;
 
-        /**
-         * Set upload file size in variable
-         */
+        /** Set upload file size in variable */
         $uploadFileSize = (int)$imageUploadSettings[$imageUploadSettingsKey]['uploadeFileSize'];
 
         /**
-         *
          * Check if upload file size
-         *
          * @param $uploadFileSize integer
          * @return void
-         *
          */
         if (empty($uploadFileSize)) {
-            return new fileException('File size not set');
+            throw new ImageException('File size not set');
         }
 
-        /**
-         * Set allowed file types in variable
-         */
+        /** Set allowed file types in variable */
         $allowedFileTypes = $imageUploadSettings[$imageUploadSettingsKey]['allowedImageTypes'];
 
-        /**
-         * Set targetfile
-         */
+        /** Set targetfile */
         //Target directory with file name
         $targetFile = $uploadFolder . basename($image["name"]);
 
-        /**
-         * Check if file is a real file and not fake
-         */
+        /** Check if file is a real file and not fake */
         $check = getimagesize($image["tmp_name"]);
         if ($check === false) {
-            return new fileException('File is not a image');
+            throw new ImageException('File is not a image');
         }
 
-        /**
-         * Check if folder excists and has the apropiate rights otherwise create and give rights
-         */
+        /** Check if folder excists and has the apropiate rights otherwise create and give rights */
         if (!file_exists($uploadFolder)) {
             mkdir($uploadFolder, 0777, true);
         } elseif (!is_writable($uploadFolder)) {
             chmod($uploadFolder, 0777);
         }
 
-        /**
-         * Check if file  excists
-         */
+        /** Check if file  excists */
         if (file_exists($targetFile)) {
-            return 'File already excist';
+            throw new ImageException('File already exist');
         }
 
         //@todo Rewrite name if file excists
 
-        /**
-         * Check if file sie is not exceeded
-         */
+        /** Check if file sie is not exceeded */
         if ($image["size"] > $uploadFileSize) {
-            return 'Image not saved. File size exceeded';
+            throw new ImageException('Image not saved. File size exceeded');
         }
 
-        /*
-         * Check if mime type is allowed for this upload
-         */
+        /** Check if mime type is allowed for this upload */
         if (!in_array($image['type'], $allowedFileTypes)) {
-            return 'File extension is not allowed';
+            throw new ImageException( 'Image not saved. File size exceeded');
         }
 
         if (copy($image["tmp_name"], $targetFile)) {
-
             list($width, $height, $type, $attr) = getimagesize($image["tmp_name"]);
-
-            $ImageFile = array();
+            $ImageFile = [];
             $ImageFile['imageFileName'] = $image["name"];
             $ImageFile['imageFolderName'] = $uploadFolder;
             $ImageFile['imgW'] = $width;
             $ImageFile['imgH'] = $height;
-            /**
-             * Create Image type
-             */
+            /** Create Image type */
             return $this->createImageType($ImageFile, $imageType, $imageObject, 0, $isOriginal);
         } else {
-
-            die(' c');
-
-            return 'Sorry, there was an error uploading your file.';
+            throw new ImageException( 'Sorry, there was an error uploading your file.');
         }
     }
 
