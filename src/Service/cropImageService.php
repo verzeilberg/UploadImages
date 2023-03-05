@@ -18,11 +18,10 @@ class cropImageService implements cropImageServiceInterface
     protected $config;
     protected $em;
 
-    /**
-     * @param $em
-     * @param $config
-     */
-    public function __construct($em, $config)
+    public function __construct(
+        $em,
+        $config
+    )
     {
         $this->config = $config;
         $this->em = $em;
