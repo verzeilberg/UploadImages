@@ -8,6 +8,8 @@ use Laminas\Session\Container;
 /*
  * Entities
  */
+
+use Symfony\Component\VarDumper\VarDumper;
 use UploadImages\Entity\Image;
 use UploadImages\Exception\fileException;
 use UploadImages\Exception\ImageException;
