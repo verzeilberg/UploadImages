@@ -113,7 +113,6 @@ class imageService implements imageServiceInterface {
                 foreach ($imageTypes AS $imageType) {
                     @unlink('public/' . $imageType->getFolder() . $imageType->getFileName());
                     $this->em->remove($imageType);
-                    $this->em->flush();
                 }
                 $this->em->remove($image);
                 $this->em->flush();

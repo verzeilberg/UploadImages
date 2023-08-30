@@ -55,7 +55,7 @@ class cropImageService implements cropImageServiceInterface
          * @return void
          */
         if (!array_key_exists($imageUploadSettingsKey, $imageUploadSettings)) {
-            throw new ImageException('Given settings does not excists');
+            throw new ImageException('Given settings does not exists');
         }
 
         /** Set upload folder in variable */
@@ -110,7 +110,7 @@ class cropImageService implements cropImageServiceInterface
             throw new ImageException('File already exist');
         }
 
-        //@todo Rewrite name if file excists
+        //@todo Rewrite name if file exists
 
         /** Check if file sie is not exceeded */
         if ($image["size"] > $uploadFileSize) {
