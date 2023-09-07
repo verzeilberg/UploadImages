@@ -275,7 +275,7 @@ class cropImageService implements cropImageServiceInterface
         // return $ImageFile;
     }
 
-    public function CropImage($srcFile = null, $dstFile = null, $x, $y, $w, $h, $dw, $dh, $img_quality = 90)
+    public function CropImage($x, $y, $w, $h, $dw, $dh, $img_quality = 90, $srcFile = null, $dstFile = null,)
     {
 
         // Check if file exist

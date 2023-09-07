@@ -141,7 +141,7 @@ class UploadImagesController extends AbstractActionController
             $h = $this->getRequest()->getPost('h');
 
             //Crop image
-            $result = $this->cropImageService->CropImage('public/' . $sImageToBeCropped, $sDestionationFolderCroppedImage, $x, $y, $w, $h, $iImgW, $iImgH);
+            $result = $this->cropImageService->CropImage($x, $y, $w, $h, $iImgW, $iImgH, 90, 'public/' . $sImageToBeCropped, $sDestionationFolderCroppedImage);
 
             # Delete the first item in the array
             array_shift($aCropDetails);
