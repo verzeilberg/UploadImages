@@ -178,6 +178,9 @@ $(document).ready(function () {
             //Push object into array with index
             linksArr[index] = linkArr;
         });
+
+        $('button#break').removeAttr('disabled');
+        $('button#break').removeClass('disabled');
         processLinksSvArray(linksArr);
     });
 
@@ -187,7 +190,7 @@ $(document).ready(function () {
      * @return void
      */
     function processLinksSvArray(linksArr) {
-        if (linksArr.length > 0) {
+        if (linksArr.length > 0 && breaking === false) {
             var id = linksArr[0]['id'];
             var name = linksArr[0]['name'];
             var folder = linksArr[0]['folder'];
@@ -197,6 +200,10 @@ $(document).ready(function () {
             });
 
             processLinksSvArrayAjax(linksArr, id, name, folder);
+        } else {
+            $('button#break').attr('disabled', 'disabled');
+            $('button#break').addClass('disabled');
+            breaking = false;
         }
     }
 
@@ -252,7 +259,7 @@ $(document).ready(function () {
     });
 
     /**
-     * Cance database image check
+     * Cancel database image check
      * @type {boolean}
      */
     var breaking = false;

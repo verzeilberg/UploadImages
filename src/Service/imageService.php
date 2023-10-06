@@ -12,15 +12,28 @@ use Laminas\Paginator\Paginator;
 /*
  * Entities
  */
+
+use Symfony\Component\VarDumper\VarDumper;
 use UploadImages\Entity\Image;
 use UploadImages\Entity\ImageType;
+use function array_reverse;
+use function array_slice;
+use function ceil;
+use function count;
+use function end;
+use function imap_fetch_overview;
+use function imap_headerinfo;
+use function imap_num_msg;
+use function str_split;
 
-class imageService implements imageServiceInterface {
+class imageService implements imageServiceInterface
+{
 
     protected $config;
     protected $em;
 
-    public function __construct($em, $config) {
+    public function __construct($em, $config)
+    {
         $this->config = $config;
         $this->em = $em;
     }
@@ -32,7 +45,8 @@ class imageService implements imageServiceInterface {
      * @return   object
      *
      */
-    public function createImage() {
+    public function createImage()
+    {
         return new Image();
     }
 
@@ -40,11 +54,12 @@ class imageService implements imageServiceInterface {
      *
      * Create image form
      *
-     * @param    image $image object
+     * @param image $image object
      * @return   form
      *
      */
-    public function createImageForm($image) {
+    public function createImageForm($image)
+    {
         $builder = new AnnotationBuilder($this->em);
         $formImage = $builder->createForm($image);
         $formImage->setHydrator(new DoctrineHydrator($this->em, 'UploadImages\Entity\Image'));
@@ -62,15 +77,16 @@ class imageService implements imageServiceInterface {
      * 
      */
 
-    public function deleteImage($image = NULL) {
+    public function deleteImage($image = null)
+    {
         if (is_object($image)) {
             $imageTypes = $image->getImageTypes();
-            
-            foreach ($imageTypes AS $imageType) {
+
+            foreach ($imageTypes as $imageType) {
                 @unlink('public/' . $imageType->getFolder() . $imageType->getFileName());
                 $this->em->remove($imageType);
             }
-            
+
             $this->em->remove($image);
             $this->em->flush();
             return true;
@@ -88,7 +104,8 @@ class imageService implements imageServiceInterface {
      * 
      */
 
-    public function deleteImageFromServer($imageUrl = null) {
+    public function deleteImageFromServer($imageUrl = null)
+    {
         if (!empty($imageUrl)) {
             $result = unlink('public/' . $imageUrl);
 
@@ -99,18 +116,19 @@ class imageService implements imageServiceInterface {
     }
 
     /**
-     * 
+     *
      * Delete array of images
      *
      * @param type $images array
      * @return void
-     * 
+     *
      */
-    public function deleteImages($images = NULL) {
+    public function deleteImages($images = null)
+    {
         if (!empty($images)) {
-            foreach ($images AS $image) {
+            foreach ($images as $image) {
                 $imageTypes = $image->getImageTypes();
-                foreach ($imageTypes AS $imageType) {
+                foreach ($imageTypes as $imageType) {
                     @unlink('public/' . $imageType->getFolder() . $imageType->getFileName());
                     $this->em->remove($imageType);
                 }
@@ -127,12 +145,13 @@ class imageService implements imageServiceInterface {
      *
      * Create redirect URL
      *
-     * @param    aReturnURL $aReturnURL array
+     * @param aReturnURL $aReturnURL array
      * @return   redirect
      *
      */
-    public function createRedirectLink($aReturnURL = NULL) {
-        if ($aReturnURL === NULL) {
+    public function createRedirectLink($aReturnURL = null)
+    {
+        if ($aReturnURL === null) {
             $this->redirect()->toRoute('home');
         } else {
             $route = $aReturnURL['route'];
@@ -145,18 +164,20 @@ class imageService implements imageServiceInterface {
      *
      * Get all images from specific folder
      *
-     * @param    rootPath $rootPath string
+     * @param rootPath $rootPath string
      * @return   array
      *
      */
-    public function getAllImageFromFolder($rootPath) {
+    public function getAllImageFromFolder($rootPath)
+    {
         $images = [];
         $dir = new \DirectoryIterator($rootPath);
 
         foreach ($dir as $fileinfo) {
             if (!$fileinfo->isDot()) {
                 if ($fileinfo->getType() == 'dir') {
-                    $images = array_merge($images, $this->getAllImageFromFolder($rootPath . '/' . $fileinfo->getFilename()));
+                    $images = array_merge($images,
+                        $this->getAllImageFromFolder($rootPath . '/' . $fileinfo->getFilename()));
                 } else {
                     $image = [];
                     $image['url'] = str_replace('/home/hosting/sander/WWW/public//', '', $fileinfo->getPathname());
@@ -178,62 +199,91 @@ class imageService implements imageServiceInterface {
 
 
     /**
-     *
      * Get array of images
-     *
      * @return      query
-     *
      */
     public function getImages()
     {
-
         $qb = $this->em->getRepository(ImageType::class)->createQueryBuilder('i')
             ->orderBy('i.fileName', 'DESC');
         return $qb->getQuery();
     }
 
     /**
-     *
-     * Get array of images  for pagination
-     * @var $items array
-     * @var $currentPage current page
-     * @var $itemsPerPage items on a page
-     *
-     * @return      array
-     *
+     * @param $items
+     * @param $itemsPage
+     * @param $currentPage
+     * @param $pageRange
+     * @return array
      */
-    public function createPaginationForArray($items, $currentPage = 1, $itemsPerPage = 10) {
-        $total = count( $items); //total items in array
-        $totalPages = ceil( $total/ $itemsPerPage ); //calculate total pages
-        $page = max($currentPage, 1); //get 1 page when $_GET['page'] <= 0
-        $page = min($page, $totalPages); //get last page when $_GET['page'] > $totalPages
-        $offset = ($page - 1) * $itemsPerPage;
-        if( $offset < 0 ) $offset = 0;
-        $previousPage = ($page == 1? 1:$currentPage - 1);
-        $nextPage = ($page == $totalPages? $totalPages:$currentPage + 1);
-        $images = array_slice( $items, $offset, $itemsPerPage );
+    public function createPagination($items = [], $itemsPage = 10, $currentPage = 1, $pageRange = 10)
+    {
+        $totalItems = count($items);
+        $totalPages = ceil($totalItems / $itemsPage);
+        $arr2 = str_split($totalPages); // convert string to an array
+        $endNumber = end($arr2);
+        $endRange = $totalPages - $endNumber;
 
-        $result = [];
         $pagination = [];
-        $pagination['currentPage'] = $currentPage;
-        $pagination['nextPage'] = $nextPage;
-        $pagination['previousPage'] = $previousPage;
-        $pagination['totalPages'] = $totalPages;
-        $result['images'] = $images;
-        $result['pagination'] = $pagination;
 
-        return $result;
+        $arr = str_split($currentPage); // convert string to an array
+        $calcNumber = end($arr);
+
+
+        if (count($arr) > 1) {
+            $backward = $currentPage - $calcNumber;
+        } else {
+            $backward = $currentPage - ($calcNumber - 1);
+        }
+        $forward = $currentPage + ($pageRange - $calcNumber);
+
+        $previousPage = $currentPage - 1;
+        $nextPage = $currentPage + 1;
+
+        $pageRangeStart = $currentPage;
+        $pageRangeEnd = $currentPage + $pageRange;
+
+        $pagination['currentPage'] = $currentPage;
+        $pagination['previousPage'] = $previousPage;
+        $pagination['nextPage'] = $nextPage;
+        $pagination['totalPages'] = $totalPages;
+        $pagination['pageRangeStart'] = $backward;
+        $pagination['pageRangeEnd'] = $forward;
+        $pagination['pageRange'] = $pageRange;
+        $pagination['endRange'] = $endRange;
+        for ($i = 1; $i <= $totalPages; $i++) {
+            $pagination['pages'][$i] = $i;
+        }
+        return $pagination;
     }
 
     /**
-     *
+     * @param $items
+     * @param $itemsPage
+     * @param $currentPage
+     * @return array
+     */
+    public function getImagesForPagination($items, $itemsPage = 10, $currentPage = 1)
+    {
+        $totalImages = count($items);
+        $length = $itemsPage;
+        $start = $totalImages - ($currentPage * ($itemsPage));
+
+        if ($start < 1) {
+            $length = (int) $length + (int) $start;
+            $start = 0;
+
+        }
+
+        return array_slice(array_reverse($items), $start, $length);
+    }
+
+    /**
      * Get array of languages  for pagination
-     * @var $query query
+     * @return      array
      * @var $currentPage current page
      * @var $itemsPerPage items on a page
-     *
-     * @return      array
-     *
+     * @var $query query
      */
     public function getItemsForPagination($query, $currentPage = 1, $itemsPerPage = 10)
     {
@@ -245,15 +295,12 @@ class imageService implements imageServiceInterface {
     }
 
     /**
-     *
      * Get all imageTypes filename and folder by ImageID
-     *
-     * @var $imageId Image id
-     * 
      * @return   array
-     *
+     * @var $imageId Image id
      */
-    public function getOriginalImageByImageID($imageId) {
+    public function getOriginalImageByImageID($imageId)
+    {
         //Get original image file
         $qb = $this->em->getRepository('UploadImages\Entity\Image')->createQueryBuilder('i');
         $qb->select('it.fileName, it.folder');
@@ -266,15 +313,12 @@ class imageService implements imageServiceInterface {
     }
 
     /**
-     *
      * Get all imageTypes filename and folder by ImageID
-     *
-     * @var $imageId Image id
-     * 
      * @return   array
-     *
+     * @var $imageId Image id
      */
-    public function getImageTypesByImageID($imageId) {
+    public function getImageTypesByImageID($imageId)
+    {
         //Get all Crop images
         $qb = $this->em->getRepository('UploadImages\Entity\Image')->createQueryBuilder('i');
         $qb->select('it.fileName, it.folder');
@@ -286,15 +330,13 @@ class imageService implements imageServiceInterface {
     }
 
     /**
-     *
      * Find image by path and image name
-     *
-     * @param    path $path string
-     * @param    name $name string
+     * @param path $path string
+     * @param name $name string
      * @return   boolean
-     *
      */
-    public function findImageByPathAndName($path = null, $name = null) {
+    public function findImageByPathAndName($path = null, $name = null)
+    {
         $path = trim($path);
         $name = trim($name);
         if (!empty($path) && !empty($name)) {
@@ -316,15 +358,13 @@ class imageService implements imageServiceInterface {
     }
 
     /**
-     *
      * Check if images excist on server
-     *
-     * @param    path $path string
-     * @param    name $name string
+     * @param path $path string
+     * @param name $name string
      * @return   boolean
-     *
      */
-    public function checkFileExcist($path = null, $name = null, $rootPath = null) {
+    public function checkFileExcist($path = null, $name = null, $rootPath = null)
+    {
         $path = trim($path);
         $name = trim($name);
         $rootPath = trim($rootPath);
@@ -341,29 +381,25 @@ class imageService implements imageServiceInterface {
     }
 
     /**
-     *
      * Get imageType object based on id
-     *
-     * @param       id  $id The id to fetch the imageType from the database
+     * @param id $id The id to fetch the imageType from the database
      * @return      object
-     *
      */
-    public function getImageTypeById($id) {
+    public function getImageTypeById($id)
+    {
         $imageType = $this->em->getRepository(ImageType::class)
-                ->findOneBy(['id' => $id], []);
+            ->findOneBy(['id' => $id], []);
 
         return $imageType;
     }
 
     /**
-     * 
      * Delete imageType
-     *
      * @param type $imageType object
      * @return void
-     * 
      */
-    public function deleteImageType($imageType = NULL) {
+    public function deleteImageType($imageType = null)
+    {
 
         if ($imageType != null) {
             $this->em->remove($imageType);
@@ -376,14 +412,12 @@ class imageService implements imageServiceInterface {
     }
 
     /**
-     * 
      * Delete imageType
-     *
      * @param type $imageType object
      * @return void
-     * 
      */
-    public function saveImage($image) {
+    public function saveImage($image)
+    {
         $this->em->persist($image);
         $this->em->flush();
     }

@@ -1,4 +1,6 @@
-g//Create well design file upload form file
+/**
+ * Create well design file upload form file
+ */
 $(document).on('change', ':file', function () {
     var input = $(this),
             numFiles = input.get(0).files ? input.get(0).files.length : 1,
@@ -9,12 +11,15 @@ $(document).on('change', ':file', function () {
 });
 
 $(document).ready(function () {
-
-//Open model afbeeldingen
+    /**
+     * Open model afbeeldingen
+     */
     $('#showImages').on('shown.bs.modal', function () {
     });
 
-//When modal edit afbeelding close open afbeeldingen modal
+    /**
+     * When modal edit afbeelding close open afbeeldingen modal
+     */
     $('#editImage').on('hidden.bs.modal', function () {
         $(function () {
             $('#showImages').modal('toggle');
@@ -25,7 +30,9 @@ $(document).ready(function () {
     })
 
 
-//Ajax function to edit Image
+    /**
+     * Ajax function to edit Image
+     */
     $("span.editImage").on("click", function () {
 
         $(function () {
@@ -53,7 +60,9 @@ $(document).ready(function () {
 
     });
 
-//Ajax function to save edited image
+    /**
+     * Ajax function to save edited image
+     */
     $("button#saveImageDetails").on("click", function () {
         var imageId = $('input[name=imageId]').val();
         var nameImage = $('input[name=editNameImage]').val();
@@ -83,7 +92,9 @@ $(document).ready(function () {
     });
 
 
-//Ajax function to delete image 
+    /**
+     * Ajax function to delete image
+     */
     $("span.deleteImageObject").on("click", function () {
         var imageId = $(this).data('imageid');
         $.ajax({
@@ -106,7 +117,9 @@ $(document).ready(function () {
         });
     });
 
-//Ajax function to recrop image
+    /**
+     * Ajax function to recrop image
+     */
     $("span.recropImage").on("click", function () {
         var imageId = $(this).data('imageid');
         var route = $(this).data('route');
@@ -132,7 +145,9 @@ $(document).ready(function () {
         });
     });
 
-    //Ajax function to rotate image
+    /**
+     * Ajax function to rotate image
+     */
     $("span.rotateImage").on("click", function () {
         var imageId = $(this).data('imageid');
         var route = $(this).data('route');
@@ -158,10 +173,8 @@ $(document).ready(function () {
         });
     });
 
-    /*
+    /**
      * Set all checkboxes to true
-     * 
-     * @return void
      */
     $("input[name='checkAll']").on("change", function () {
         var atLeastOneIsChecked = $("input[name='checkAll']:checked").length > 0;
@@ -173,10 +186,11 @@ $(document).ready(function () {
 
     });
 
-    /*
+    /**
      * Ajax function to check images with server and db
      */
     $("span.checkImages").on("click", function () {
+        console.log('dsadaadsd');
         var linksArr = [];
         $("input[name='url']:checked").each(function (index) {
             var url = $(this).val();
@@ -197,10 +211,9 @@ $(document).ready(function () {
         processLinksSvArray(linksArr);
     });
 
-    /*
+    /**
      * Proccess the given array
-     * 
-     * @return void
+     * @param linksArr
      */
     function processLinksSvArray(linksArr) {
         if (linksArr.length > 0) {
@@ -216,6 +229,13 @@ $(document).ready(function () {
         }
     }
 
+    /**
+     * Process the links array by Ajax
+     * @param linksArr
+     * @param id
+     * @param name
+     * @param folder
+     */
     function processLinksSvArrayAjax(linksArr, id, name, folder) {
         $.ajax({
             type: 'POST',
@@ -240,12 +260,11 @@ $(document).ready(function () {
         });
     }
 
-    /*
+    /**
      * Ajax function to check images with db and servers
-     * 
-     * @return void
      */
     $("span.checkDatabaseImages").on("click", function () {
+        console.log('checkDatabaseImages');
         var linksArr = [];
         $("input[name='url']:checked").each(function (index) {
             var url = $(this).val();
@@ -262,14 +281,12 @@ $(document).ready(function () {
             //Push object into array with index
             linksArr[index] = linkArr;
         });
-        console.log('ja');
         processLinksDbArray(linksArr);
     });
 
-    /*
-     * Proccess the given array
-     * 
-     * @return void
+    /**
+     * Process the given array
+     * @param linksArr
      */
     function processLinksDbArray(linksArr) {
         if (linksArr.length > 0) {
@@ -285,12 +302,15 @@ $(document).ready(function () {
         }
     }
 
-    /*
+    /**
      * Execute ajax call to check if image in db is on the server
-     * 
-     * @return void
+     * @param linksArr
+     * @param id
+     * @param name
+     * @param folder
      */
     function processLinksDbArrayAjax(linksArr, id, name, folder) {
+        console.log('in ajax request');
         $.ajax({
             type: 'POST',
             data: {
@@ -314,10 +334,8 @@ $(document).ready(function () {
         });
     }
 
-    /*
-     * Ajax function to delete image from server
-     * 
-     * @return void
+    /**
+     *  Ajax function to delete image from server
      */
     $(document).on("click", "span.deleteImage", function () {
         var id = $(this).data('id');
@@ -340,10 +358,8 @@ $(document).ready(function () {
         });
 
     });
-    /*
-     * Ajax function to delete image from database
-     * 
-     * @return void
+    /**
+     *  Ajax function to delete image from database
      */
     $(document).on("click", "span.deleteImageRow", function () {
         var id = $(this).data('id');
@@ -364,8 +380,5 @@ $(document).ready(function () {
                 }
             }
         });
-
     });
-
-
 });

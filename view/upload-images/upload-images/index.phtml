@@ -1,19 +1,47 @@
-<?php
-$this->headTitle('Add Blog');
-$this->mainMenu()->setActiveItemId('blog');
-$this->pageBreadcrumbs()->setItems([
-    'Beheer' => $this->url('beheer'),
-    'Images' => $this->url('beheer/images')
-]);
-?>
-<hgroup id="headAdminTitle" class="col-sm-12 col-md-12 col-lg-12">
-    <h1 id="index">Images</h1>
-</hgroup>
-<!-- Breadcrumbs -->
-<div class="col-lg-12 col-md-12 col-sm-12">
-    <?= $this->pageBreadcrumbs()->render(); ?>
-</div>
-<!-- Main Content -->
-<div class="container">
-
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded  p-4">
+                <div class="row g-4">
+                    <h2 class="col-sm-12 col-md-12 col-xl-12 mb-4 text-primary">Images</h2>
+                </div>
+                <div class="row g-4 mb-3">
+                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
+                        <h4>Server check</h4>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
+                        <h4>File check</h4>
+                    </div>
+                </div>
+                <div class="row g-4 mb-3">
+                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
+                        <i class="fas fa-images fa-lg"></i> -> <i class="fas fa-database fa-lg"></i>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
+                        <i class="fas fa-database fa-lg"></i> -> <i class="fas fa-images fa-lg"></i>
+                    </div>
+                </div>
+                <div class="row g-4 mb-3">
+                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
+                        <p>Check if pictures on the server are in the database.</p>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
+                        <p>Check if the pictures are on the server that are in the database.</p>
+                    </div>
+                </div>
+                <div class="row g-4 mb-3">
+                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
+                        <a class="btn btn-sm btn-primary" href="<?= $this->url('beheer/images', ['action' => 'server-check']); ?>">
+                            Server Check
+                        </a>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
+                        <a class="btn btn-sm btn-primary" href="<?= $this->url('beheer/images', ['action' => 'file-check']); ?>">
+                            File Check
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

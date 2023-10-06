@@ -54,15 +54,14 @@ class UploadImagesController extends AbstractActionController
         $this->vhm->get('headScript')->appendFile('/js/uploadImages.js');
         $page = $this->params()->fromQuery('page', 1);
         $rootPath = $this->config['imageUploadSettings']['rootPath'];
-
         $images = $this->imageService->getAllImageFromFolder($rootPath);
-
-        $result = $this->imageService->createPaginationForArray($images, $page, 10);
+        $currentImagesInPagination = $this->imageService->getImagesForPagination($images, 10, $page);
+        $pagination = $this->imageService->createPagination($images, 10, $page);
 
         return new ViewModel(
             array(
-                'images' => $result['images'],
-                'paginationSettings' => $result['pagination']
+                'images' => $currentImagesInPagination,
+                'pagination' => $pagination
             )
         );
     }
@@ -85,20 +84,13 @@ class UploadImagesController extends AbstractActionController
 
     public function cropAction()
     {
-
-
         $this->layout('layout/crop');
         $this->vhm->get('headScript')->appendFile('/js/jquery.Jcrop.min.js');
         $this->vhm->get('headLink')->appendStylesheet('/css/jCrop/jquery.Jcrop.min.css');
         $container = new Container('cropImages');
 
-
-
         $aCropDetails = $container->offsetGet('cropimages')??[];
         $aReturnURL = $container->offsetGet('returnUrl');
-
-
-
         $iXcrops = count($aCropDetails);
 
         if (empty($aCropDetails)) {

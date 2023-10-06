@@ -1,63 +1,59 @@
-<?php
-$this->headTitle('Images');
-$this->mainMenu()->setActiveItemId('imagesbeheer');
-$this->pageBreadcrumbs()->setLayout('beheer');
-$this->pageBreadcrumbs()->setItems([
-    'Beheer' => $this->url('beheer'),
-    'Images' => $this->url('beheer/images'),
-]);
-?>
-<!-- Page Header -->
-<div class="row">
-    <h1 class="col">IMAGES BEHEER</h1>
-</div>
-<!-- Breadcrumbs -->
-<div class="row">
-    <div class="col">
-        <?= $this->pageBreadcrumbs()->render(); ?>
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded  p-4">
+                <div class="row g-4">
+                    <h2 class="col-sm-12 col-md-12 col-xl-12 mb-4 text-primary">Images: file check</h2>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-auto">
+                        <span class="btn btn-primary checkDatabaseImages">
+                            <i class="fas fa-plus-square"></i> Check Database images
+                        </span>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-danger disable" id="break" disabled="disable">
+                            <i class="fas fa-plus-square"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <table class="table table-sm table-bordered table-hover table-striped">
+                            <thead>
+                            <tr>
+                                <th class="text-center"><input type="checkbox" value="1" name="checkAll"/></th>
+                                <th>In database</th>
+                                <th>Op server</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($images as $image) { ?>
+                                <tr id="img<?php echo $image->getId(); ?>">
+                                    <td class="text-center"><input type="checkbox"
+                                                                   value="<?php echo $image->getId(); ?>|<?php echo $image->getFolder() . $image->getFileName(); ?>"
+                                                                   name="url"/></td>
+                                    <td>
+                                        <?php echo $image->getFolder() . $image->getFileName(); ?>
+                                    </td>
+                                    <td class="result"></td>
+                                </tr>
+                            <?php } ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-4">
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded  mt-4 p-4">
+                <?= $this->paginationControl($images,
+                    'Sliding',
+                    'layout/paginator',
+                    array('route' => 'beheer/images', 'action' => 'fileCheck')); ?>
+            </div>
+        </div>
     </div>
 </div>
-<!-- Page header options -->
-<div class="row mb-3">
-    <div class="col-md-auto">
-    <span class="btn btn-dark checkDatabaseImages">
-        <i class="fas fa-plus-square"></i> Check Database images
-    </span>
-    </div>
-    <div class="col">
-    <button class="btn btn-danger disable" id="break" disabled="disable">
-        <i class="fas fa-plus-square"></i> Cancel
-    </button>
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        <table class="table table-dark table-sm table-bordered table-hover table-striped">
-            <thead class="thead-dark">
-            <tr>
-                <th class="text-center"><input type="checkbox" value="1" name="checkAll"/></th>
-                <th>In database</th>
-                <th>Op server</th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($images AS $image) { ?>
-                <tr id="img<?php echo $image->getId(); ?>">
-                    <td class="text-center"><input type="checkbox"
-                                                   value="<?php echo $image->getId(); ?>|<?php echo $image->getFolder() . $image->getFileName(); ?>"
-                                                   name="url"/></td>
-                    <td>
-                        <?php echo $image->getFolder() . $image->getFileName(); ?>
-                    </td>
-                    <td class="result"></td>
-                </tr>
-            <?php } ?>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<?= $this->paginationControl($images,
-    'Sliding',
-    'layout/paginator',
-    array('route' => 'beheer/images', 'action' => 'fileCheck')); ?>
