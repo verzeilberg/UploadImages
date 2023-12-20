@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManager;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
 use Laminas\Form\Form;
-use UploadImages\Service\cropImageServiceInterface;
+use UploadImages\Service\cropImageService;
 use Laminas\Session\Container;
 
 /*
@@ -28,7 +28,7 @@ class UploadImagesController extends AbstractActionController
     protected $em;
     protected $config;
 
-    public function __construct(cropImageServiceInterface $cropImageService, $rotateImageService, $vhm, $em, $imageService, $config)
+    public function __construct(cropImageService $cropImageService, $rotateImageService, $vhm, $em, $imageService, $config)
     {
         $this->cropImageService = $cropImageService;
         $this->rotateImageService = $rotateImageService;

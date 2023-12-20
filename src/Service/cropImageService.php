@@ -14,7 +14,7 @@ use UploadImages\Entity\Image;
 use UploadImages\Exception\fileException;
 use UploadImages\Exception\ImageException;
 
-class cropImageService implements cropImageServiceInterface
+class cropImageService
 {
 
     protected $config;

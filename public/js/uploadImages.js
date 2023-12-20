@@ -1,4 +1,11 @@
 $(document).ready(function () {
+
+    const myModal = new bootstrap.Modal('#progressBarModal', {
+        keyboard: false,
+        backdrop: false
+    })
+
+
 //When modal edit afbeelding close open afbeeldingen modal
     $('#editImageModal').on('hidden.bs.modal', function () {
         $(function () {
@@ -178,7 +185,6 @@ $(document).ready(function () {
             //Push object into array with index
             linksArr[index] = linkArr;
         });
-
         $('button#break').removeAttr('disabled');
         $('button#break').removeClass('disabled');
         processLinksSvArray(linksArr);
@@ -231,9 +237,94 @@ $(document).ready(function () {
         });
     }
 
+    /**
+     * Check al images in the database (compare with file on server)
+     */
+    $("span.checkAllDatabaseImages").on("click", function () {
+        $.ajax({
+            type: 'POST',
+            url: "/ajaximage/getAllDatabaseImages",
+            async: true,
+            success: function (data) {
+                let totalImageTypes = data.result.length;
+                if (totalImageTypes > 0) {
+                    $('#progressBarModal').modal('toggle');
+                    processLinksDbAllArray(data.result, totalImageTypes);
+                } else {
+                    console.log(data.result);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    });
+
+    /**
+     * Process links
+     * @param linksArr
+     */
+    function processLinksDbAllArray(linksArr, totalResult) {
+        if (linksArr.length > 0 && breaking === false) {
+            var id = linksArr[0]['id'];
+            var name = linksArr[0]['name'];
+            var folder = linksArr[0]['folder'];
+
+            var linksArr = $.grep(linksArr, function (e) {
+                return e.id != id;
+            });
+            processLinksDbAllArrayAjax(linksArr, id, name, folder, totalResult);
+        } else {
+            $('button#break').attr('disabled', 'disabled');
+            $('button#break').addClass('disabled');
+            breaking = false;
+        }
+    }
+
+    function processLinksDbAllArrayAjax(linksArr, id, name, folder, totalResult) {
+
+        let part = 100/totalResult;
+        let progress = (totalResult - linksArr.length) * part;
+
+        $.ajax({
+            type: 'POST',
+            data: {
+                id: id,
+                name: name,
+                folder: folder
+            },
+            url: "/ajaximage/checkDatabaseImage",
+            async: true,
+            success: function (data) {
+                if (data.succes === true) {
+                    console.log('ok');
+                } else {
+                    $('div#imageResults').append(
+                        "" +
+                        "<div class='row mb-2'>" +
+                        "<span class='col'>"+id+"</span> | " +
+                        "<span class='col'>"+name+"</span> | " +
+                        "<span class='col'>"+folder+"</span> | " +
+                        "<span class='col text-end'><span class='btn btn-primary btn-sm deleteImage' " +
+                        "data-id='"+id+"' data-url='" + folder + name + "'>" +
+                        "<i class=\"fas fa-trash-alt\"></i>" +
+                        "</span></span>" +
+                        "</div>"
+                    );
+                }
+
+                $('div#progressBar > div.progress-bar').css('width', progress + '%');
+
+                processLinksDbAllArray(linksArr, totalResult);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+    }
+
     /*
      * Ajax function to check images with db and servers
-     * 
      * @return void
      */
     $("span.checkDatabaseImages").on("click", function () {
@@ -302,7 +393,7 @@ $(document).ready(function () {
                 name: name,
                 folder: folder
             },
-            url: "/ajaximage/checkDatabseImage",
+            url: "/ajaximage/checkDatabaseImage",
             async: true,
             success: function (data) {
                 if (data.succes === true) {

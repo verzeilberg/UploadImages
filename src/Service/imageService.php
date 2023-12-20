@@ -13,7 +13,6 @@ use Laminas\Paginator\Paginator;
  * Entities
  */
 
-use Symfony\Component\VarDumper\VarDumper;
 use UploadImages\Entity\Image;
 use UploadImages\Entity\ImageType;
 use function array_reverse;
@@ -26,7 +25,7 @@ use function imap_headerinfo;
 use function imap_num_msg;
 use function str_split;
 
-class imageService implements imageServiceInterface
+class imageService
 {
 
     protected $config;
@@ -195,6 +194,10 @@ class imageService implements imageServiceInterface
         return $images;
 
 
+    }
+
+    public function getAllImages() {
+        return $this->em->getRepository(Image::class)->findAll();
     }
 
 

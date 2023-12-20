@@ -11,6 +11,11 @@
                             <i class="fas fa-plus-square"></i> Check Database images
                         </span>
                     </div>
+                    <div class="col-md-auto">
+                        <span class="btn btn-primary checkAllDatabaseImages">
+                            <i class="fas fa-plus-square"></i> Check All Database images
+                        </span>
+                    </div>
                     <div class="col">
                         <button class="btn btn-danger disable" id="break" disabled="disable">
                             <i class="fas fa-plus-square"></i> Cancel
@@ -57,3 +62,7 @@
         </div>
     </div>
 </div>
+
+<?php
+echo $this->partial('upload-images/partial/progress_images.phtml');
+?>

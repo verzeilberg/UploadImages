@@ -5,7 +5,7 @@ namespace UploadImages\Service;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\Session\Container;
 
-class rotateImageService implements rotateImageServiceInterface {
+class rotateImageService {
 
     /**
      * @var \Blog\Service\PostServiceInterface

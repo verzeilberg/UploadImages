@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManager;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
 use Laminas\Form\Form;
+use Symfony\Component\VarDumper\VarDumper;
+use UploadImages\Service\cropImageService;
 use UploadImages\Service\cropImageServiceInterface;
 use Laminas\Session\Container;
 
@@ -15,17 +17,26 @@ use Laminas\Session\Container;
  * Entities
  */
 use UploadImages\Entity\Image;
+use UploadImages\Service\imageService;
+use UploadImages\Service\rotateImageService;
 
 class AjaxImageController extends AbstractActionController {
 
-    protected $cropImageService;
-    protected $rotateImageService;
-    protected $imageService;
+    protected cropImageService $cropImageService;
+    protected rotateImageService $rotateImageService;
+    protected imageService $imageService;
     protected $vhm;
     protected $em;
     protected $config;
 
-    public function __construct(cropImageServiceInterface $cropImageService, $rotateImageService, $vhm, $em, $imageService, $config) {
+    public function __construct(
+        cropImageService $cropImageService,
+        rotateImageService $rotateImageService,
+        $vhm,
+        $em,
+        imageService $imageService,
+        $config
+    ) {
         $this->cropImageService = $cropImageService;
         $this->rotateImageService = $rotateImageService;
         $this->imageService = $imageService;
@@ -268,6 +279,27 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
+    public function getAllDatabaseImagesAction()
+    {
+        $result = [];
+        $images = $this->imageService->getAllImages();
+
+        $key = 0;
+        foreach($images as $image) {
+            foreach ($image->getImageTypes() as $imageType) {
+                $result[$key]['id'] = $imageType->getId();
+                $result[$key]['name'] = $imageType->getFileName();
+                $result[$key]['folder'] = $imageType->getFolder();
+
+                $key++;
+            }
+        }
+
+        return new JsonModel([
+            'result' => $result
+        ]);
+    }
+
     public function checkServerImageAction() {
         $errorMessage = '';
         $succes = true;
@@ -284,7 +316,7 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function checkDatabseImageAction() {
+    public function checkDatabaseImageAction() {
         $errorMessage = '';
         $succes = true;
         $id = $this->params()->fromPost('id', 0);
