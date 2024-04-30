@@ -1,11 +1,5 @@
 $(document).ready(function () {
 
-    const myModal = new bootstrap.Modal('#progressBarModal', {
-        keyboard: false,
-        backdrop: false
-    })
-
-
 //When modal edit afbeelding close open afbeeldingen modal
     $('#editImageModal').on('hidden.bs.modal', function () {
         $(function () {
@@ -123,7 +117,7 @@ $(document).ready(function () {
             }
         });
     });
-    
+
     //Ajax function to rotate image
     $("span.rotateImage").on("click", function () {
         var imageId = $(this).data('imageid');
@@ -152,7 +146,7 @@ $(document).ready(function () {
 
     /*
      * Set all checkboxes to true
-     * 
+     *
      * @return void
      */
     $("input[name='checkAll']").on("change", function () {
@@ -192,7 +186,7 @@ $(document).ready(function () {
 
     /*
      * Proccess the given array
-     * 
+     *
      * @return void
      */
     function processLinksSvArray(linksArr) {
@@ -437,7 +431,7 @@ $(document).ready(function () {
     });
     /*
      * Ajax function to delete image from database
-     * 
+     *
      * @return void
      */
     $(document).on("click", "span.deleteImageRow", function () {
