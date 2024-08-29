@@ -13,6 +13,7 @@ use Laminas\Paginator\Paginator;
  * Entities
  */
 
+use Symfony\Component\VarDumper\VarDumper;
 use UploadImages\Entity\Image;
 use UploadImages\Entity\ImageType;
 use function array_reverse;
@@ -68,12 +69,12 @@ class imageService
     }
 
     /*
-     * 
+     *
      * Delete image object
-     * 
+     *
      * @param type $image object
      * @return void
-     * 
+     *
      */
 
     public function deleteImage($image = null)
@@ -95,20 +96,18 @@ class imageService
     }
 
     /*
-     * 
+     *
      * Delete image file from server
-     * 
+     *
      * @param type $imageUrl string
      * @return void
-     * 
+     *
      */
 
     public function deleteImageFromServer($imageUrl = null)
     {
         if (!empty($imageUrl)) {
-            $result = unlink('public/' . $imageUrl);
-
-            return $result;
+            return unlink('/public/' . $imageUrl);
         } else {
             return false;
         }

@@ -245,7 +245,7 @@ $(document).ready(function () {
                     $('#progressBarModal').modal('toggle');
                     processLinksDbAllArray(data.result, totalImageTypes);
                 } else {
-                    console.log(data.result);
+                    alert("Geen afbeeldingen gevonden!")
                 }
             },
             error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -296,6 +296,7 @@ $(document).ready(function () {
                     $('div#imageResults').append(
                         "" +
                         "<div class='row mb-2'>" +
+                        "<span class='col'><input type='checkbox' name='delete-image'/></span> | " +
                         "<span class='col'>"+id+"</span> | " +
                         "<span class='col'>"+name+"</span> | " +
                         "<span class='col'>"+folder+"</span> | " +

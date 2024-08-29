@@ -49,24 +49,24 @@ class AjaxImageController extends AbstractActionController {
         $errorMessage = '';
         $succes = true;
         $imageId = (int) $this->params()->fromPost('imageId', 0);
-        
+
         if (empty($imageId) || $imageId < 0) {
             $errorMessage = 'Geen afbeelding id meegegeven!';
             $succes = false;
         }
-        
+
         $image = $this->em
                 ->getRepository('UploadImages\Entity\Image')
                 ->findOneBy(array('ImageId' => $imageId));
-        
-        
+
+
 
         if (!is_object($image)) {
             $errorMessage = 'Geen afbeelding gevonden met id ' . $imageId . ' gevonden!';
             $succes = false;
         } else {
             $imageTypes = $image->getImageTypes();
-            
+
             foreach ($imageTypes AS $imageType) {
                 @unlink('public/' . $imageType->getFolder() . $imageType->getFileName());
                 $this->em->remove($imageType);
@@ -77,7 +77,7 @@ class AjaxImageController extends AbstractActionController {
 
             $succes = true;
         }
-        
+
         return new JsonModel([
             'errorMessage' => $errorMessage,
             'succes' => $succes,
@@ -108,7 +108,7 @@ class AjaxImageController extends AbstractActionController {
             $imageDetails['imageDescription'] = $image->getDescriptionImage();
             $succes = true;
         }
-        
+
         return new JsonModel([
             'errorMessage' => $errorMessage,
             'succes' => $succes,
@@ -231,7 +231,7 @@ class AjaxImageController extends AbstractActionController {
         $originalFolder = $imageOriginal['folder'];
 
         $imageTypes = $this->imageService->getImageTypesByImageID($imageId);
-        
+
         //Create return url after cropping images
         $returnURL = $this->cropImageService->createReturnURL($route, $action, $id);
 
