@@ -1,16 +1,18 @@
 .imageOptions {
-    margin-top:10px;
+    margin-top: 10px;
 }
+
 .imageOptions span {
     cursor: pointer;
-    margin:0 2px;
+    margin: 0 2px;
 }
 
 .recropImage i {
-    font-size:16px;
+    font-size: 16px;
 }
+
 .btn-file {
-        position: relative;
+    position: relative;
     overflow: hidden;
     cursor: pointer;
     color: #ffffff;
@@ -18,7 +20,8 @@
     background-image: linear-gradient(to bottom, #494f49, #292e29);
     border-color: #839683 #839683 #839683;
 }
-.btn-file:hover  {
+
+.btn-file:hover {
     color: #ffffff;
     background-color: #292e29;
     background-image: linear-gradient(to bottom, #292e29, #292e29);
@@ -39,4 +42,41 @@
     background: white;
     cursor: inherit;
     display: block;
+}
+
+div#image-results-table {
+    display: none;
+}
+
+/** Result table **/
+
+
+
+#image_result-placeholder {
+    width: 100%;
+}
+
+#image-result-head-placeholder {
+    margin-right: 15px;
+}
+
+#image-result-body-placeholder {
+    width: 100%;
+    height:100%;
+    overflow: auto;
+}
+
+#image-result-head,
+#image-result-body {
+    width: 100%
+}
+
+
+
+.notransition {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -o-transition: none !important;
+    -ms-transition: none !important;
+    transition: none !important;
 }

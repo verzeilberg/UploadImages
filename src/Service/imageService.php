@@ -95,22 +95,17 @@ class imageService
         }
     }
 
-    /*
-     *
-     * Delete image file from server
-     *
-     * @param type $imageUrl string
-     * @return void
-     *
+    /**
+     * @param $imageUrl
+     * @return bool
      */
-
     public function deleteImageFromServer($imageUrl = null)
     {
+        $result = false;
         if (!empty($imageUrl)) {
-            return unlink('/public/' . $imageUrl);
-        } else {
-            return false;
+            $result = unlink('public/' . $imageUrl);
         }
+        return $result;
     }
 
     /**
@@ -178,7 +173,7 @@ class imageService
                         $this->getAllImageFromFolder($rootPath . '/' . $fileinfo->getFilename()));
                 } else {
                     $image = [];
-                    $image['url'] = str_replace('/home/hosting/sander/WWW/public//', '', $fileinfo->getPathname());
+                    $image['url'] = str_replace($_SERVER['DOCUMENT_ROOT'], '', $fileinfo->getPathname());
                     $image['fileName'] = $fileinfo->getFilename();
                     $image['fileSize'] = $fileinfo->getSize();
                     $image['type'] = $fileinfo->getType();
@@ -195,8 +190,14 @@ class imageService
 
     }
 
-    public function getAllImages() {
+    public function getAllImages()
+    {
         return $this->em->getRepository(Image::class)->findAll();
+    }
+
+    public function getAllImageTypes()
+    {
+        return $this->em->getRepository(ImageType::class)->findAll();
     }
 
 
@@ -208,6 +209,7 @@ class imageService
     {
         $qb = $this->em->getRepository(ImageType::class)->createQueryBuilder('i')
             ->orderBy('i.fileName', 'DESC');
+
         return $qb->getQuery();
     }
 
@@ -272,7 +274,7 @@ class imageService
         $start = $totalImages - ($currentPage * ($itemsPage));
 
         if ($start < 1) {
-            $length = (int) $length + (int) $start;
+            $length = (int)$length + (int)$start;
             $start = 0;
 
         }
@@ -360,10 +362,11 @@ class imageService
     }
 
     /**
-     * Check if images excist on server
-     * @param path $path string
-     * @param name $name string
-     * @return   boolean
+     * Check if a image exist on the server
+     * @param $path
+     * @param $name
+     * @param $rootPath
+     * @return bool
      */
     public function checkFileExcist($path = null, $name = null, $rootPath = null)
     {
@@ -371,7 +374,7 @@ class imageService
         $name = trim($name);
         $rootPath = trim($rootPath);
         if (!empty($path) && !empty($name) && !empty($rootPath)) {
-            $fullUrl = $_SERVER['DOCUMENT_ROOT'] . $path . $name;
+            $fullUrl = 'public/' . $path . $name;
             if (file_exists($fullUrl)) {
                 return true;
             } else {
@@ -380,6 +383,27 @@ class imageService
         } else {
             return false;
         }
+    }
+
+    /**
+     * @param $path
+     * @return bool
+     */
+    public function checkFileExistInDatabase($path): bool
+    {
+        $result = false;
+        $fileParts = $this->getFileAndFolderName($path);
+        $imageType = $this->em->getRepository(ImageType::class)
+            ->findOneBy(
+                [
+                    'fileName'  => $fileParts['fileName'],
+                    'folder'    => $fileParts['folder']
+                ], []);
+        if ($imageType) {
+            $result = true;
+        }
+
+        return $result;
     }
 
     /**
@@ -422,6 +446,30 @@ class imageService
     {
         $this->em->persist($image);
         $this->em->flush();
+    }
+
+    /**
+     *
+     * Extract folder and file name from the URL.
+     *
+     * @param string $url The URL from which to extract the folder and file name.
+     * @return array An associative array containing 'folder' and 'fileName'.
+     *
+     */
+    private function getFileAndFolderName(string $url): array
+    {
+        $result = [];
+        $lastSlashPos = strrpos($url, '/');
+        if ($lastSlashPos !== false) {
+            // Deel voor de laatste slash
+            $folder = substr($url, 0, $lastSlashPos);
+            // Deel na de laatste slash
+            $fileName = substr($url, $lastSlashPos + 1);
+            $result['folder'] = ltrim($folder, '/') . '/';
+            $result['fileName'] = $fileName;
+        }
+
+        return $result;
     }
 
 }

@@ -51,35 +51,19 @@ class UploadImagesController extends AbstractActionController
     public function serverCheckAction()
     {
         $this->layout('layout/beheer');
+        $this->vhm->get('headLink')->appendStylesheet('/css/upload-image.css');
         $this->vhm->get('headScript')->appendFile('/js/uploadImages.js');
-        $page = $this->params()->fromQuery('page', 1);
-        $rootPath = $this->config['imageUploadSettings']['rootPath'];
-        $images = $this->imageService->getAllImageFromFolder($rootPath);
-        $currentImagesInPagination = $this->imageService->getImagesForPagination($images, 10, $page);
-        $pagination = $this->imageService->createPagination($images, 10, $page);
 
-        return new ViewModel(
-            array(
-                'images' => $currentImagesInPagination,
-                'pagination' => $pagination
-            )
-        );
+        return new ViewModel();
     }
 
     public function fileCheckAction()
     {
         $this->layout('layout/beheer');
+        $this->vhm->get('headLink')->appendStylesheet('/css/upload-image.css');
         $this->vhm->get('headScript')->appendFile('/js/uploadImages.js');
-        $page = $this->params()->fromQuery('page', 1);
 
-        $query = $this->imageService->getImages();
-        $images = $this->imageService->getItemsForPagination($query, $page, 10);
-
-        return new ViewModel(
-            array(
-                'images' => $images,
-            )
-        );
+        return new ViewModel();
     }
 
     public function cropAction()
@@ -106,7 +90,7 @@ class UploadImagesController extends AbstractActionController
         $sDestionationFolderCroppedImage = $oCropDetails['destinationFolder']; //Folder where the image has to be saved
         $iImgW = (int)$oCropDetails['ImgW']; //Image width
         $iImgH = (int)$oCropDetails['ImgH']; //Image height
-        // Get the widht and height of the orignal image        
+        // Get the widht and height of the orignal image
         $aFileProps = getimagesize('public/' . $sImageToBeCropped);
 
         $iWidth = (int)$aFileProps[0];

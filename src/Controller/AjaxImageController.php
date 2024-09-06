@@ -16,11 +16,13 @@ use Laminas\Session\Container;
 /*
  * Entities
  */
+
 use UploadImages\Entity\Image;
 use UploadImages\Service\imageService;
 use UploadImages\Service\rotateImageService;
 
-class AjaxImageController extends AbstractActionController {
+class AjaxImageController extends AbstractActionController
+{
 
     protected cropImageService $cropImageService;
     protected rotateImageService $rotateImageService;
@@ -30,13 +32,14 @@ class AjaxImageController extends AbstractActionController {
     protected $config;
 
     public function __construct(
-        cropImageService $cropImageService,
+        cropImageService   $cropImageService,
         rotateImageService $rotateImageService,
-        $vhm,
-        $em,
-        imageService $imageService,
-        $config
-    ) {
+                           $vhm,
+                           $em,
+        imageService       $imageService,
+                           $config
+    )
+    {
         $this->cropImageService = $cropImageService;
         $this->rotateImageService = $rotateImageService;
         $this->imageService = $imageService;
@@ -45,10 +48,14 @@ class AjaxImageController extends AbstractActionController {
         $this->config = $config;
     }
 
-    public function deleteAction() {
+    /**
+     * @return JsonModel
+     */
+    public function deleteAction(): JsonModel
+    {
         $errorMessage = '';
         $succes = true;
-        $imageId = (int) $this->params()->fromPost('imageId', 0);
+        $imageId = (int)$this->params()->fromPost('imageId', 0);
 
         if (empty($imageId) || $imageId < 0) {
             $errorMessage = 'Geen afbeelding id meegegeven!';
@@ -56,9 +63,8 @@ class AjaxImageController extends AbstractActionController {
         }
 
         $image = $this->em
-                ->getRepository('UploadImages\Entity\Image')
-                ->findOneBy(array('ImageId' => $imageId));
-
+            ->getRepository('UploadImages\Entity\Image')
+            ->findOneBy(array('ImageId' => $imageId));
 
 
         if (!is_object($image)) {
@@ -67,7 +73,7 @@ class AjaxImageController extends AbstractActionController {
         } else {
             $imageTypes = $image->getImageTypes();
 
-            foreach ($imageTypes AS $imageType) {
+            foreach ($imageTypes as $imageType) {
                 @unlink('public/' . $imageType->getFolder() . $imageType->getFileName());
                 $this->em->remove($imageType);
             }
@@ -85,18 +91,22 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function getImageAction() {
+    /**
+     * @return JsonModel
+     */
+    public function getImageAction(): JsonModel
+    {
         $errorMessage = '';
         $succes = true;
-        $imageId = (int) $this->params()->fromPost('imageId', 0);
+        $imageId = (int)$this->params()->fromPost('imageId', 0);
         if (empty($imageId) || $imageId == 0) {
             $errorMessage = 'Geen afbeelding id meegegeven!';
             $succes = false;
         }
 
         $image = $this->em
-                ->getRepository('UploadImages\Entity\Image')
-                ->findOneBy(array('ImageId' => $imageId));
+            ->getRepository('UploadImages\Entity\Image')
+            ->findOneBy(array('ImageId' => $imageId));
 
         if (!is_object($image)) {
             $errorMessage = 'Geen afbeelding gevonden met id ' . $imageId . ' gevonden!';
@@ -117,18 +127,22 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function saveImageAction() {
+    /**
+     * @return JsonModel
+     */
+    public function saveImageAction(): JsonModel
+    {
         $errorMessage = '';
         $succes = true;
-        $imageId = (int) $this->params()->fromPost('imageId', 0);
+        $imageId = (int)$this->params()->fromPost('imageId', 0);
         if (empty($imageId) || $imageId == 0) {
             $errorMessage = 'Geen afbeelding id meegegeven!';
             $succes = false;
         }
 
         $image = $this->em
-                ->getRepository('UploadImages\Entity\Image')
-                ->findOneBy(array('ImageId' => $imageId));
+            ->getRepository('UploadImages\Entity\Image')
+            ->findOneBy(array('ImageId' => $imageId));
 
         if (!is_object($image)) {
             $errorMessage = 'Geen afbeelding met id ' . $imageId . ' gevonden!';
@@ -153,13 +167,17 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function reCropAction() {
+    /**
+     * @return JsonModel
+     */
+    public function reCropAction(): JsonModel
+    {
         $errorMessage = '';
         $succes = true;
-        $imageId = (int) $this->params()->fromPost('imageId', 0);
+        $imageId = (int)$this->params()->fromPost('imageId', 0);
         $route = $this->params()->fromPost('route');
         $action = $this->params()->fromPost('action');
-        $id = (int) $this->params()->fromPost('id');
+        $id = (int)$this->params()->fromPost('id');
         if (empty($imageId) || $imageId == 0) {
             $errorMessage = 'Geen afbeelding id meegegeven!';
             $succes = false;
@@ -214,13 +232,17 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function rotateAction() {
+    /**
+     * @return JsonModel
+     */
+    public function rotateAction(): JsonModel
+    {
         $errorMessage = '';
         $succes = true;
-        $imageId = (int) $this->params()->fromPost('imageId', 0);
+        $imageId = (int)$this->params()->fromPost('imageId', 0);
         $route = $this->params()->fromPost('route');
         $action = $this->params()->fromPost('action');
-        $id = (int) $this->params()->fromPost('id');
+        $id = (int)$this->params()->fromPost('id');
         if (empty($imageId) || $imageId == 0) {
             $errorMessage = 'Geen afbeelding id meegegeven!';
             $succes = false;
@@ -238,7 +260,7 @@ class AjaxImageController extends AbstractActionController {
         //Create session container for crop
         $this->rotateImageService->createContainerImage($imageOriginal, $imageTypes, $returnURL);
 
-        //Check if there any items in the array
+        //Check if there are any items in the array
         if (is_array($imageTypes)) {
             $succes = true;
         } else {
@@ -252,7 +274,11 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function sortImagesAction() {
+    /**
+     * @return JsonModel
+     */
+    public function sortImagesAction(): JsonModel
+    {
         $errorMessage = '';
         $succes = true;
         $images = $this->params()->fromPost('images', 0);
@@ -262,12 +288,12 @@ class AjaxImageController extends AbstractActionController {
             $succes = false;
         }
 
-        foreach ($images AS $index => $imageId) {
+        foreach ($images as $index => $imageId) {
             $image = $this->em
-                    ->getRepository('UploadImages\Entity\Image')
-                    ->findOneBy(array('ImageId' => $imageId));
+                ->getRepository('UploadImages\Entity\Image')
+                ->findOneBy(array('ImageId' => $imageId));
 
-            $image->setSortOrder((int) $index);
+            $image->setSortOrder((int)$index);
             $this->em->persist($image);
             $this->em->flush();
             $succes = true;
@@ -279,18 +305,43 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function getAllDatabaseImagesAction()
+    /**
+     * @return JsonModel
+     */
+    public function getAllDatabaseImagesAction(): JsonModel
     {
         $result = [];
-        $images = $this->imageService->getAllImages();
+        $imageTypes = $this->imageService->getAllImageTypes();
 
         $key = 0;
-        foreach($images as $image) {
-            foreach ($image->getImageTypes() as $imageType) {
-                $result[$key]['id'] = $imageType->getId();
-                $result[$key]['name'] = $imageType->getFileName();
-                $result[$key]['folder'] = $imageType->getFolder();
+        foreach ($imageTypes as $imageType) {
 
+            $result[$key]['id'] = $imageType->getId();
+            $result[$key]['name'] = $imageType->getFileName();
+            $result[$key]['folder'] = $imageType->getFolder();
+
+            $key++;
+        }
+
+        return new JsonModel([
+            'result' => $result
+        ]);
+    }
+
+    /**
+     * @return JsonModel
+     */
+    public function getAllServerImagesAction(): JsonModel
+    {
+        $result = [];
+        $rootPath = $this->config['imageUploadSettings']['rootPath'];
+        $images = $this->imageService->getAllImageFromFolder($rootPath);
+
+        $key = 0;
+        foreach ($images as $image) {
+            $imageExist = $this->imageService->checkFileExistInDatabase($image['url']);
+            if (!$imageExist) {
+                $result[$key]['url'] = $image['url'];
                 $key++;
             }
         }
@@ -300,7 +351,9 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function checkServerImageAction() {
+
+    public function checkServerImageAction()
+    {
         $errorMessage = '';
         $succes = true;
         $id = $this->params()->fromPost('id', 0);
@@ -316,7 +369,8 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function checkDatabaseImageAction() {
+    public function checkDatabaseImageAction()
+    {
         $errorMessage = '';
         $succes = true;
         $id = $this->params()->fromPost('id', 0);
@@ -333,12 +387,14 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function deleteImageFromServerAction() {
+    /**
+     * @return JsonModel
+     */
+    public function deleteImageFromServerAction(): JsonModel
+    {
         $errorMessage = '';
-        $succes = true;
         $id = $this->params()->fromPost('id', 0);
         $url = $this->params()->fromPost('url', 0);
-
         $succes = $this->imageService->deleteImageFromServer($url);
 
         return new JsonModel([
@@ -348,7 +404,35 @@ class AjaxImageController extends AbstractActionController {
         ]);
     }
 
-    public function deleteImageFromDatabaseAction() {
+    public function deleteImagesFromServerAction(): JsonModel
+    {
+        $errorMessage = '';
+        $images = $this->params()->fromPost('images', []);
+        $result = [];
+        foreach ($images AS $id => $image) {
+            $succes = $this->imageService->deleteImageFromServer($image[1]);
+            $result[$image[0]] = $succes;
+        }
+        return new JsonModel([
+            'errorMessage' => $errorMessage,
+            'succes' => $succes,
+            'result' => $result
+        ]);
+    }
+
+    /**
+     * Deletes an image from the database.
+     *
+     * This method retrieves the image ID and URL from the request parameters and uses them
+     * to retrieve the corresponding image type from the image service. The image type is
+     * then deleted from the database. The method returns a JSON response containing the
+     * error message (if any), success status, and the ID of the deleted image.
+     *
+     * @return JsonModel Returns a JSON response containing the error message (if any),
+     *                  success status, and the ID of the deleted image.
+     */
+    public function deleteImageFromDatabaseAction(): JsonModel
+    {
         $errorMessage = '';
         $succes = true;
         $id = $this->params()->fromPost('id', 0);
@@ -361,6 +445,30 @@ class AjaxImageController extends AbstractActionController {
             'errorMessage' => $errorMessage,
             'succes' => $succes,
             'id' => $id
+        ]);
+    }
+
+    /**
+     * Deletes multiple image types from the database.
+     * @return JsonModel The JSON model containing the success status and error message, if any.
+     */
+    public function deleteImagesFromDatabaseAction(): JsonModel
+    {
+        $errorMessage = '';
+        $succes = true;
+        $images = $this->params()->fromPost('images', []);
+        $imageMessages = [];
+        foreach($images as $index => $image) {
+            $imageType = $this->imageService->getImageTypeById($image[1]);
+            $succes = $this->imageService->deleteImageType($imageType);
+            $imageMessages[$index]['rowIndex'] = $image[0];
+            $imageMessages[$index]['succes'] = $succes;
+        }
+
+        return new JsonModel([
+            'errorMessage' => $errorMessage,
+            'succes' => $succes,
+            'imageMessages' => $imageMessages
         ]);
     }
 
