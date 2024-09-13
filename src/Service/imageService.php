@@ -2,6 +2,7 @@
 
 namespace UploadImages\Service;
 
+use DirectoryIterator;
 use Laminas\Form\Annotation\AnnotationBuilder;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Doctrine\Laminas\Hydrator\DoctrineObject as DoctrineHydrator;
@@ -13,9 +14,13 @@ use Laminas\Paginator\Paginator;
  * Entities
  */
 
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Symfony\Component\VarDumper\VarDumper;
 use UploadImages\Entity\Image;
 use UploadImages\Entity\ImageType;
+use UploadImages\Exception\DeleteFileException;
+use UploadImages\Exception\DeleteFolderException;
 use function array_reverse;
 use function array_slice;
 use function ceil;
@@ -77,13 +82,16 @@ class imageService
      *
      */
 
+    /**
+     * @throws DeleteFileException
+     */
     public function deleteImage($image = null)
     {
+
         if (is_object($image)) {
             $imageTypes = $image->getImageTypes();
-
             foreach ($imageTypes as $imageType) {
-                @unlink('public/' . $imageType->getFolder() . $imageType->getFileName());
+                $this->deleteFile('public/' . $imageType->getFolder() . $imageType->getFileName());
                 $this->em->remove($imageType);
             }
 
@@ -103,9 +111,46 @@ class imageService
     {
         $result = false;
         if (!empty($imageUrl)) {
-            $result = unlink('public/' . $imageUrl);
+            $this->deleteFile('public/' . $imageUrl);
         }
         return $result;
+    }
+
+    /**
+     * @throws DeleteFolderException
+     * @throws DeleteFileException
+     */
+    public function deleteDirectoryFromServer($directory) {
+        // Check if the directory exists
+        if (!is_dir($directory)) {
+            throw new DeleteFolderException(sprintf('Directory "%s" doesn\'t excist', $directory));
+        }
+
+        // Create a DirectoryIterator instance
+        $iterator = new DirectoryIterator($directory);
+        foreach ($iterator as $fileinfo) {
+            if ($fileinfo->isDot()) {
+                continue;
+            }
+
+            // If it's a directory, recursively delete it
+            if ($fileinfo->isDir()) {
+                $this->deleteDirectoryFromServer($fileinfo->getPathname());
+            } else {
+                // If it's a file, delete it
+                $this->deleteFile($fileinfo->getPathname());
+            }
+        }
+
+
+        // After deleting the contents, delete the directory itself
+        if (!rmdir($directory)) {
+            $error = error_get_last();
+            throw new DeleteFolderException($error['message']);
+        }
+
+        return true;
+
     }
 
     /**
@@ -122,7 +167,7 @@ class imageService
             foreach ($images as $image) {
                 $imageTypes = $image->getImageTypes();
                 foreach ($imageTypes as $imageType) {
-                    @unlink('public/' . $imageType->getFolder() . $imageType->getFileName());
+                    $this->deleteFile('public/' . $imageType->getFolder() . $imageType->getFileName());
                     $this->em->remove($imageType);
                 }
                 $this->em->remove($image);
@@ -142,7 +187,7 @@ class imageService
      * @return   redirect
      *
      */
-    public function createRedirectLink($aReturnURL = null)
+    public function createRedirectLink($aReturnURL = null): redirect
     {
         if ($aReturnURL === null) {
             $this->redirect()->toRoute('home');
@@ -154,14 +199,53 @@ class imageService
     }
 
     /**
+     * @param $rootPath
+     * @return array
+     */
+    public function getAllFilesAndFolders($rootPath): array
+    {
+        $folders = [];
+        $dir = new \DirectoryIterator($_SERVER['DOCUMENT_ROOT'] . $rootPath);
+        foreach ($dir as $index => $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                    $type = $fileinfo->getType();
+                    $size = $fileinfo->getSize();
+                    $path = $fileinfo->getRealPath();
+                    if ($type === 'dir') {
+                        $size = $this->getFolderSize($path);
+                    }
+
+                    $folders[$index]['prio']    = $type === 'dir'? 1:2;
+                    $folders[$index]['type']    = $type;
+                    $folders[$index]['name']    = $fileinfo->getFilename();
+                    $folders[$index]['ext']     = $fileinfo->getExtension();
+                    $folders[$index]['path']    = $path;
+                    $folders[$index]['size']    = number_format($size / 1000, 2, ',', '');;
+            }
+        }
+        //Sort folders and files by prio and name
+        usort($folders, function ($a, $b) {
+            // First, compare by 'prio'
+            if ($a['prio'] == $b['prio']) {
+                // If 'prio' is the same, compare by 'name'
+                return strtolower($a['name']) <=> strtolower($b['name']);
+            }
+            // Compare by 'prio'
+            return $a['prio'] <=> $b['prio'];
+        });
+
+        return $folders;
+    }
+
+    /**
      *
      * Get all images from specific folder
      *
-     * @param rootPath $rootPath string
+     * @param $rootPath string
      * @return   array
      *
      */
-    public function getAllImageFromFolder($rootPath)
+    public function getAllImageFromFolder($rootPath): array
     {
         $images = [];
         $dir = new \DirectoryIterator($rootPath);
@@ -190,6 +274,45 @@ class imageService
 
     }
 
+    /**
+     * Search for a file or folder for given path (haystack)
+     * @param $needle
+     * @param $haystack
+     * @return array
+     */
+    public function searchForImageOrFolder($needle, $haystack): array
+    {
+        $haystack = $_SERVER['DOCUMENT_ROOT'] . $haystack;
+        $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($haystack));
+        $files = [];
+        $index = 0;
+        foreach ($it as $fileinfo) {
+            if (strpos(strtolower(basename($fileinfo)), strtolower($needle)) !== false) {
+
+                $type = $fileinfo->getType();
+                $size = $fileinfo->getSize();
+                $path = $fileinfo->getRealPath();
+                if ($type === 'dir') {
+                    $size = $this->getFolderSize($path);
+                }
+
+                $files[$index]['prio']      = $type === 'dir'? 1:2;
+                $files[$index]['type']      = $type;
+                $files[$index]['name']      = $fileinfo->getFilename();
+                $files[$index]['ext']       = $fileinfo->getExtension();
+                $files[$index]['path']      = $path;
+                $files[$index]['size']      = number_format($size / 1000, 2, ',', '');
+
+                $index++;
+            }
+        }
+        return $files;
+    }
+
+    /**
+     * Get all Images from the database
+     * @return mixed
+     */
     public function getAllImages()
     {
         return $this->em->getRepository(Image::class)->findAll();
@@ -421,12 +544,11 @@ class imageService
 
     /**
      * Delete imageType
-     * @param type $imageType object
+     * @param null $imageType object
      * @return void
      */
     public function deleteImageType($imageType = null)
     {
-
         if ($imageType != null) {
             $this->em->remove($imageType);
             $this->em->flush();
@@ -470,6 +592,55 @@ class imageService
         }
 
         return $result;
+    }
+
+
+    /**
+     * @param $folderPath
+     * @return int
+     */
+    private function getFolderSize($folderPath): int
+    {
+        $size = 0;
+
+        // Controleer of het pad een geldige directory is
+        if (is_dir($folderPath)) {
+            $directory = new DirectoryIterator($folderPath);
+
+            foreach ($directory as $fileinfo) {
+                // Negeer '.' en '..'
+                if (!$fileinfo->isDot()) {
+                    // Als het een bestand is, voeg de grootte toe
+                    if ($fileinfo->isFile()) {
+                        $size += $fileinfo->getSize();
+                    } // Als het een directory is, kun je recursief verdergaan (optioneel)
+                    elseif ($fileinfo->isDir()) {
+                        // Recursief de grootte van submappen optellen
+                        $size += $this->getFolderSize($fileinfo->getPathname());
+                    }
+                }
+            }
+        }
+
+        return $size;
+    }
+
+    /**
+     * Delete a file from the file system.
+     *
+     * @param string $file The path to the file to be deleted.
+     * @return void True if the file was successfully deleted.
+     * @throws DeleteFileException If an error occurs during file deletion.
+     */
+    private function deleteFile(string $file)
+    {
+        if (!unlink($file)) {
+            $error = error_get_last();
+            throw new DeleteFileException("Er is een fout opgetreden bij het verwijderen van het bestand: " . $error['message']);
+        }
+
+        return true;
+
     }
 
 }

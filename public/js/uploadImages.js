@@ -630,4 +630,30 @@ $(document).ready(function () {
     $('button#cancelImageScan').click(function () {
         resetImageScan();
     });
+
+
+    $(document).on("click", "button.delete-fileorfolder", function () {
+        let path = $(this).data('path');
+        let type = $(this).data('type');
+        let index = $(this).data('index');
+        $.ajax({
+            type: 'POST',
+            data: {
+                path: path,
+                type: type
+            },
+            url: "/ajaximage/deleteImageOrFolderFromServer",
+            async: true,
+            success: function (data) {
+                if (data.succes) {
+                    $("tr#fileRow"+index).fadeOut(300, function(){ $(this).remove();});
+                } else {
+                    alert(data.errorMessage);
+                }
+            }
+        });
+
+    });
+
+
 });

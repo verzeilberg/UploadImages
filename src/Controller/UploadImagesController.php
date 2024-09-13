@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use DoctrineModule\Stdlib\Hydrator\DoctrineObject as DoctrineHydrator;
 use DoctrineORMModule\Form\Annotation\AnnotationBuilder;
 use Laminas\Form\Form;
+use Symfony\Component\VarDumper\VarDumper;
 use UploadImages\Service\cropImageService;
 use Laminas\Session\Container;
 
@@ -17,13 +18,14 @@ use Laminas\Session\Container;
  */
 
 use UploadImages\Entity\Image;
+use UploadImages\Service\imageService;
 
 class UploadImagesController extends AbstractActionController
 {
 
     protected $cropImageService;
     protected $rotateImageService;
-    protected $imageService;
+    protected imageService $imageService;
     protected $vhm;
     protected $em;
     protected $config;
@@ -41,10 +43,24 @@ class UploadImagesController extends AbstractActionController
     public function indexAction()
     {
         $this->layout('layout/beheer');
+        $this->vhm->get('headLink')->appendStylesheet('/css/upload-image.css');
+        $this->vhm->get('headScript')->appendFile('/js/uploadImages.js');
 
+        $publicPath = $this->config['imageUploadSettings']['publicPath'];
+        $url = $this->params()->fromQuery('url', $publicPath);
+        $folders = $this->imageService->getAllFilesAndFolders($url);
+
+        if ($this->getRequest()->isPost() && !empty($this->getRequest()->getPost('search'))) {
+            $searchString = $this->getRequest()->getPost('search');
+            $folders = $this->imageService->searchForImageOrFolder($searchString, $url);
+        }
 
         return new ViewModel(
-            array()
+            [
+                'folders'       => $folders,
+                'currentFolder' => $url,
+                'searchString'  => $searchString,
+                ]
         );
     }
 
@@ -107,7 +123,6 @@ class UploadImagesController extends AbstractActionController
                 return $this->createRedirectLink($aReturnURL);
             }
         }
-
 
         //if user crops image
         if ($this->getRequest()->isPost()) {
@@ -184,9 +199,6 @@ class UploadImagesController extends AbstractActionController
         if ($aReturnURL === NULL) {
             $this->redirect()->toRoute('home');
         } else {
-
-            var_dump($aReturnURL);
-
             $route = $aReturnURL['route'];
             unset($aReturnURL['route']);
             return $this->redirect()->toRoute($route, $aReturnURL);

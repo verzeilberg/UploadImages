@@ -1,46 +1,61 @@
+<?php
+
+use Symfony\Component\VarDumper\VarDumper;
+
+?>
 <div class="container-fluid pt-4 px-4">
     <div class="row g-4">
         <div class="col-sm-12 col-md-12 col-xl-12">
             <div class="bg-secondary rounded  p-4">
                 <div class="row g-4">
-                    <h2 class="col-sm-12 col-md-12 col-xl-12 mb-4 text-primary">Images</h2>
+                    <h2 class="col-sm-12 col-md-12 col-xl-12 mb-4">Files</h2>
+                    <h6 class="col-sm-12 col-md-12 col-xl-12 mb-4 text-primary"><?= $this->renderFileDirectoryIcons()->renderBreadcrumb($currentFolder); ?></h6>
                 </div>
-                <div class="row g-4 mb-3">
-                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
-                        <h4>Server check</h4>
+                <form name="searchEvents" method="post"
+                      action="">
+                    <div class="row g-4">
+                        <div class="col-sm-10 col-md-10 col-xl-10 text-end">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                        <div class="col-sm-2 col-md-2 col-xl-2">
+                            <input class="form-control" name="search" value="<?php echo $searchString; ?>"
+                                   type="search"
+                                   placeholder="Search" aria-label="Search">
+                        </div>
                     </div>
-                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
-                        <h4>File check</h4>
-                    </div>
-                </div>
-                <div class="row g-4 mb-3">
-                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
-                        <i class="fas fa-images fa-lg"></i> -> <i class="fas fa-database fa-lg"></i>
-                    </div>
-                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
-                        <i class="fas fa-database fa-lg"></i> -> <i class="fas fa-images fa-lg"></i>
-                    </div>
-                </div>
-                <div class="row g-4 mb-3">
-                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
-                        <p>Check if pictures on the server are in the database.</p>
-                    </div>
-                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
-                        <p>Check if the pictures are on the server that are in the database.</p>
-                    </div>
-                </div>
-                <div class="row g-4 mb-3">
-                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
-                        <a class="btn btn-sm btn-primary" href="<?= $this->url('beheer/images', ['action' => 'server-check']); ?>">
-                            Server Check
-                        </a>
-                    </div>
-                    <div class="col-sm-6 col-md-6 col-xl-6 text-center">
-                        <a class="btn btn-sm btn-primary" href="<?= $this->url('beheer/images', ['action' => 'file-check']); ?>">
-                            File Check
-                        </a>
-                    </div>
-                </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-xl-12">
+            <div class="bg-secondary rounded  p-4">
+                <?php if (count($folders) > 0) { ?>
+                <table id="filesTable" class="table table-bordered table-hover table-striped">
+                    <thead>
+                    <tr>
+                        <th>Naam</th>
+                        <th>Bestandslocatie</th>
+                        <th>Grootte</th>
+                        <th class="text-center"><i class="fas fa-cogs"></i></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($folders as $index => $folder) { ?>
+                            <?php $path = $this->renderFileDirectoryIcons()->renderPublicFileFolderName($folder['path']); ?>
+                         <tr id="fileRow<?= $index ?>">
+                             <td>
+                                <?= $this->renderFileDirectoryIcons()->render($folder) ?>
+                             </td>
+                             <td><?= $path ?></td>
+                             <td><?= $folder['size']; ?> kb</td>
+                             <td class="text-center"><button class="btn btn-sm btn-danger delete-fileorfolder" data-index="<?= $index ?>" data-type="<?= $folder['type']; ?>" data-path="<?= $path ?>"><i class="fas fa-trash-alt"></i></button></td>
+                         </tr>
+                    <?php } ?>
+
+                    </tbody>
+                </table>
+                <?php } else { ?>
+                    <p>Geen bestanden gevonden in deze folder.</p>
+                <?php } ?>
             </div>
         </div>
     </div>

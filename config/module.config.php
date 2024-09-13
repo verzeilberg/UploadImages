@@ -6,6 +6,8 @@ use Laminas\Router\Http\Literal;
 use Laminas\Router\Http\Segment;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use UploadImages\View\Helper\Factory\RenderFileDirectoryIconsFactory;
+use UploadImages\View\Helper\RenderFileDirectoryIcons;
 
 return [
     'controllers' => [
@@ -17,11 +19,12 @@ return [
             'imagesbeheer' => Controller\UploadImagesController::class,
         ],
     ],
-    'service_manager' => [
-        'invokables' => [
-            Service\cropImageServiceInterface::class => Service\cropImageService::class,
-            Service\rotateImageServiceInterface::class => Service\rotateImageService::class,
-            Service\imageServiceInterface::class => Service\imageService::class
+    'view_helpers' => [
+        'factories' => [
+            View\Helper\RenderFileDirectoryIcons::class => RenderFileDirectoryIconsFactory::class,
+        ],
+        'aliases' => [
+            'renderFileDirectoryIcons' => RenderFileDirectoryIcons::class,
         ],
     ],
     // The following section is new and should be added to your file
@@ -110,5 +113,6 @@ return [
             ],
         ],
         'rootPath' => $_SERVER['DOCUMENT_ROOT'] . '/img/userFiles',
+        'publicPath' => '/img/userFiles',
     ],
 ];

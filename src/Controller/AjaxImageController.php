@@ -352,6 +352,9 @@ class AjaxImageController extends AbstractActionController
     }
 
 
+    /**
+     * @return JsonModel
+     */
     public function checkServerImageAction()
     {
         $errorMessage = '';
@@ -369,6 +372,9 @@ class AjaxImageController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @return JsonModel
+     */
     public function checkDatabaseImageAction()
     {
         $errorMessage = '';
@@ -395,7 +401,13 @@ class AjaxImageController extends AbstractActionController
         $errorMessage = '';
         $id = $this->params()->fromPost('id', 0);
         $url = $this->params()->fromPost('url', 0);
-        $succes = $this->imageService->deleteImageFromServer($url);
+
+        try {
+            $succes = $this->imageService->deleteImageFromServer($url);
+        } catch (\Exception $exception) {
+            $errorMessage = $exception->getMessage();
+            $succes = false;
+        }
 
         return new JsonModel([
             'errorMessage' => $errorMessage,
@@ -404,19 +416,57 @@ class AjaxImageController extends AbstractActionController
         ]);
     }
 
+    /**
+     * @return JsonModel
+     */
     public function deleteImagesFromServerAction(): JsonModel
     {
         $errorMessage = '';
+        $succes = false;
         $images = $this->params()->fromPost('images', []);
         $result = [];
-        foreach ($images AS $id => $image) {
-            $succes = $this->imageService->deleteImageFromServer($image[1]);
-            $result[$image[0]] = $succes;
+        try {
+            foreach ($images as $id => $image) {
+                $succes = $this->imageService->deleteImageFromServer($image[1]);
+                $result[$image[0]] = $succes;
+            }
+        } catch (\Exception $exception) {
+            $errorMessage = $exception->getMessage();
+
         }
         return new JsonModel([
             'errorMessage' => $errorMessage,
             'succes' => $succes,
             'result' => $result
+        ]);
+    }
+
+    /**
+     * @return JsonModel
+     */
+    public function deleteImageOrFolderFromServerAction(): JsonModel
+    {
+        $errorMessage = '';
+        $path = $this->params()->fromPost('path', null);
+        $type = $this->params()->fromPost('type', null);
+
+        try {
+            if ($type === 'dir') {
+                $succes = $this->imageService->deleteDirectoryFromServer($_SERVER['DOCUMENT_ROOT'] . $path);
+            } else if ($type === 'file') {
+                $succes = $this->imageService->deleteImageFromServer($path);
+            } else {
+                $succes = 'false';
+                $errorMessage = 'path is not a file or folder';
+            }
+        } catch (\Exception $exception) {
+            $succes = false;
+            $errorMessage = $exception->getMessage();
+        }
+
+        return new JsonModel([
+            'errorMessage' => $errorMessage,
+            'succes' => $succes
         ]);
     }
 

@@ -80,3 +80,12 @@ div#image-results-table {
     -ms-transition: none !important;
     transition: none !important;
 }
+
+table#filesTable {
+    width:100%;
+}
+
+table#filesTable tr td  {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
