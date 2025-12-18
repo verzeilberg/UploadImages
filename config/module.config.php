@@ -6,8 +6,8 @@ use Laminas\Router\Http\Literal;
 use Laminas\Router\Http\Segment;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use UploadImages\View\Helper\Factory\RenderFileDirectoryIconsFactory;
-use UploadImages\View\Helper\RenderFileDirectoryIcons;
+use UploadImages\View\Helper\Factory\UploadImagesHelperFactory;
+use UploadImages\View\Helper\UploadImagesHelper;
 
 return [
     'controllers' => [
@@ -21,10 +21,10 @@ return [
     ],
     'view_helpers' => [
         'factories' => [
-            View\Helper\RenderFileDirectoryIcons::class => RenderFileDirectoryIconsFactory::class,
+            View\Helper\UploadImagesHelper::class => UploadImagesHelperFactory::class,
         ],
         'aliases' => [
-            'renderFileDirectoryIcons' => RenderFileDirectoryIcons::class,
+            'UploadImagesHelper' => UploadImagesHelper::class,
         ],
     ],
     // The following section is new and should be added to your file

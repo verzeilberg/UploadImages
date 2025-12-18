@@ -2,19 +2,15 @@
 
 namespace UploadImages\View\Helper;
 
-use JetBrains\PhpStorm\NoReturn;
 use Laminas\View\Helper\AbstractHelper;
-use Symfony\Component\VarDumper\VarDumper;
-use function in_array;
 use function str_replace;
-use function strtolower;
 use function trim;
 
 /**
- * RenderFileDirectoryIcons is responsible for generating HTML strings
+ * UploadImagesHelper is responsible for generating HTML strings
  * that represent icons for file types and directories.
  */
-class RenderFileDirectoryIcons extends AbstractHelper
+class UploadImagesHelper extends AbstractHelper
 {
 
     protected $config;
@@ -82,12 +78,8 @@ class RenderFileDirectoryIcons extends AbstractHelper
             $breadcrumb .= "/<a href='?url=" . $publicPath . $currentPath . "'>" . $part . "</a>";
         }
 
-        // Het kruimelpad tonen
+        // Het kruimelpad terugsturen
         return $breadcrumb;
     }
 
-    public function renderPublicFileFolderName($path)
-    {
-        return str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
-    }
 }

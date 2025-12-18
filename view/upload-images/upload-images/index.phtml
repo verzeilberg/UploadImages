@@ -9,7 +9,7 @@ use Symfony\Component\VarDumper\VarDumper;
             <div class="bg-secondary rounded  p-4">
                 <div class="row g-4">
                     <h2 class="col-sm-12 col-md-12 col-xl-12 mb-4">Files</h2>
-                    <h6 class="col-sm-12 col-md-12 col-xl-12 mb-4 text-primary"><?= $this->renderFileDirectoryIcons()->renderBreadcrumb($currentFolder); ?></h6>
+                    <h6 class="col-sm-12 col-md-12 col-xl-12 mb-4 text-primary"><?= $this->UploadImagesHelper()->renderBreadcrumb($currentFolder); ?></h6>
                 </div>
                 <form name="searchEvents" method="post"
                       action="">
@@ -40,10 +40,10 @@ use Symfony\Component\VarDumper\VarDumper;
                     </thead>
                     <tbody>
                     <?php foreach ($folders as $index => $folder) { ?>
-                            <?php $path = $this->renderFileDirectoryIcons()->renderPublicFileFolderName($folder['path']); ?>
+                            <?php $path = $this->UploadImagesHelper()->renderPublicFileFolderName($folder['path']); ?>
                          <tr id="fileRow<?= $index ?>">
                              <td>
-                                <?= $this->renderFileDirectoryIcons()->render($folder) ?>
+                                <?= $this->UploadImagesHelper()->render($folder) ?>
                              </td>
                              <td><?= $path ?></td>
                              <td><?= $folder['size']; ?> kb</td>

@@ -5,26 +5,26 @@ namespace UploadImages\View\Helper\Factory;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Application\View\Helper\Menu;
-use UploadImages\View\Helper\RenderFileDirectoryIcons;
+use UploadImages\View\Helper\UploadImagesHelper;
 
 /**
- * Factory class responsible for creating instances of RenderFileDirectoryIcons.
+ * Factory class responsible for creating instances of UploadImagesHelper.
  *
  * This factory retrieves the configuration from the container and uses it to
- * instantiate the RenderFileDirectoryIcons class.
+ * instantiate the UploadImagesHelper class.
  *
  * Implements the FactoryInterface to ensure that the factory method __invoke
  * is defined and can be used to create the service with dependencies provided
  * by the container.
  */
-class RenderFileDirectoryIconsFactory implements FactoryInterface
+class UploadImagesHelperFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): RenderFileDirectoryIcons
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): UploadImagesHelper
     {
         $config                 = $container->get('config');
 
         // Instantiate the helper.
-        return new RenderFileDirectoryIcons (
+        return new UploadImagesHelper (
             $config
         );
     }
